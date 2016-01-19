@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -17,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	// Start message service...
-	//go sendService()
+	go sendService()
 
 	// Start email queue handler...
 	go EmailSendQueueHandler()
@@ -97,8 +98,21 @@ type webUserResponse struct {
 	Status string
 }
 
-//func sendService() {
-//	for {
-//
-//	}
-//}
+func sendService() {
+	for {
+		log.Println("Getting scheduled messages.")
+
+		rows, err := GetMessagesToSend()
+		if err != nil {
+			log.Println(err.Error())
+		}
+
+		log.Printf("Found %d scheduled messages.\n", len(rows))
+
+		for _, msg := range rows {
+			msg.Send()
+		}
+
+		time.Sleep(1000 * time.Millisecond * 60 * 10) // 10 minutes
+	}
+}

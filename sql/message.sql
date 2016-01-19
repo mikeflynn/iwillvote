@@ -8,5 +8,5 @@ CREATE TABLE `message` (
   `sent` tinyint(4) DEFAULT '0',
   `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `network` (`network`,`uuid`)
+  KEY `network` (`network`,`uuid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

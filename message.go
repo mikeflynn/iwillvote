@@ -18,7 +18,22 @@ type Message struct {
 }
 
 func GetMessagesToSend() ([]*Message, error) {
-	return []*Message{}, nil
+	db := NewMySQL()
+
+	result, err := db.Select("SELECT id, network, uuid, message, outgoing, created_on, send_on, sent FROM message WHERE sent = 0 AND send_on < now()")
+	if err != nil {
+		return []*Message{}, err
+	}
+
+	rows := []*Message{}
+
+	for result.Next() {
+		msg := &Message{}
+		result.Scan(&msg.ID, &msg.Network, &msg.UUID, &msg.Message, &msg.Outgoing, &msg.CreatedOn, &msg.SendOn, &msg.Sent)
+		rows = append(rows, msg)
+	}
+
+	return rows, nil
 }
 
 func (this *Message) Save() error {
