@@ -2,20 +2,25 @@ package main
 
 import (
 	"errors"
+	"log"
 )
 
 type User struct {
-	ID        int64  `json:"id"`
-	Network   string `json:"network"`
-	UUID      string `json:"uuid"`
-	Name      string `json:"name"`
-	State     string `json:"state"`
-	Zipcode   int    `json:"zipcode"`
-	CreatedOn string `json:"created_on"`
-	Deleted   int    `json:"deleted"`
+	ID            int64  `json:"id"`
+	Network       string `json:"network"`
+	UUID          string `json:"uuid"`
+	Name          string `json:"name"`
+	State         string `json:"state"`
+	Zipcode       int    `json:"zipcode"`
+	CreatedOn     string `json:"created_on"`
+	Deleted       int    `json:"deleted"`
+	LandingPage   string `json:"landing_page"`
+	MessageWindow string `json:"message_window"`
+	News          int    `json:"news_feed"`
+	Reminders     int    `json:"reminders"`
 }
 
-//func GetUsers() ([]*User, error) {
+//func FilterUsers() ([]*User, error) {
 //
 //}
 
@@ -34,13 +39,17 @@ func (this *User) Save() error {
 
 	if this.ID == 0 {
 		newID, err := db.Insert(
-			"INSERT INTO user SET network=?, uuid=?, name=?, state=?, zipcode=?, deleted=?",
+			"INSERT INTO user SET network=?, uuid=?, name=?, state=?, zipcode=?, deleted=?, landing_page=?, message_window=?, news=?, reminders=?",
 			this.Network,
 			this.UUID,
 			this.Name,
 			this.State,
 			this.Zipcode,
 			this.Deleted,
+			this.LandingPage,
+			this.MessageWindow,
+			this.News,
+			this.Reminders,
 		)
 
 		if err == nil {
@@ -48,13 +57,18 @@ func (this *User) Save() error {
 		}
 	} else {
 		_, err = db.Update(
-			"UPDATE user SET network=?, uuid=?, name=?, state=?, zipcode=?, deleted=? WHERE id=?",
+			"UPDATE user SET network=?, uuid=?, name=?, state=?, zipcode=?, deleted=?, landing_page=?, message_window=?, news=?, reminders=? WHERE id=?",
 			this.Network,
 			this.UUID,
 			this.Name,
 			this.State,
 			this.Zipcode,
 			this.Deleted,
+			this.LandingPage,
+			this.MessageWindow,
+			this.News,
+			this.Reminders,
+			this.ID,
 		)
 	}
 
@@ -81,13 +95,17 @@ func (this *User) Load() error {
 		return errors.New("Message missing required fields for load: id or network and uuid")
 	}
 
-	result, err := db.Select("SELECT id, network, uuid, name, zipcode, created_on, deleted FROM message WHERE "+where+" LIMIT 1", params...)
+	result, err := db.Select("SELECT id, network, uuid, name, state, zipcode, created_on, deleted, landing_page, message_window, news, reminders FROM user WHERE "+where+" LIMIT 1", params...)
 	if err != nil {
 		return err
 	}
 
 	for result.Next() {
-		result.Scan(&this.ID, &this.Network, &this.UUID, &this.Name, &this.State, &this.Zipcode, &this.CreatedOn, &this.Deleted)
+		err = result.Scan(&this.ID, &this.Network, &this.UUID, &this.Name, &this.State, &this.Zipcode, &this.CreatedOn, &this.Deleted, &this.LandingPage, &this.MessageWindow, &this.News, &this.Reminders)
+		if err != nil {
+			log.Println(err.Error())
+			return err
+		}
 	}
 
 	return nil

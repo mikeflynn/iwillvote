@@ -72,12 +72,7 @@ func (this *MySQLConfig) Connect() bool {
 func (this *MySQLConfig) Select(query string, params ...interface{}) (*sql.Rows, error) {
 	this.Connect()
 
-	rows, err := this.Connection.Query(query, params...)
-	if err == nil {
-		return rows, nil
-	}
-
-	return &sql.Rows{}, err
+	return this.Connection.Query(query, params...)
 }
 
 func (this *MySQLConfig) Insert(query string, params ...interface{}) (int64, error) {
