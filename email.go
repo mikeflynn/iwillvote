@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/smtp"
 	"time"
+
+	gmail "google.golang.org/api/gmail/v1"
 )
 
 type Email struct {
@@ -33,6 +35,14 @@ func EmailSendQueueHandler() {
 
 		time.Sleep(1000 * time.Millisecond)
 	}
+}
+
+func AuthGmail() {
+
+}
+
+func listGMailMessages() {
+
 }
 
 func sendEmail(email *Email) error {
