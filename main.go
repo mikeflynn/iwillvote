@@ -17,6 +17,8 @@ var WebRoot = flag.String("root", "./webroot/", "The web file root directory.")
 func main() {
 	flag.Parse()
 
+	log.Printf("Web root directory set to: %s", *WebRoot)
+
 	// Start message service...
 	go sendService()
 
@@ -30,8 +32,7 @@ func main() {
 	r.HandleFunc("/", pageHandler)
 
 	// Static files
-	fs := http.FileServer(http.Dir(*WebRoot + "static"))
-	r.Handle("/static/", http.StripPrefix("/static/", fs))
+	r.PathPrefix("/static/").Handler(http.FileServer(http.Dir(*WebRoot)))
 
 	// API Endpoints
 	r.HandleFunc("/api/user/add/", addUserHandler).Methods("POST")
@@ -87,10 +88,11 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 
 	user := &User{
-		Network: r.FormValue("network"),
-		UUID:    r.FormValue("uuid"),
-		Name:    r.FormValue("name"),
-		State:   r.FormValue("state"),
+		Network:       r.FormValue("network"),
+		UUID:          r.FormValue("uuid"),
+		Name:          r.FormValue("name"),
+		State:         r.FormValue("state"),
+		MessageWindow: r.FormValue("window"),
 	}
 
 	err = user.Load()

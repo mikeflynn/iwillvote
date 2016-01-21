@@ -10,8 +10,8 @@ jQuery(document).ready(function() {
       }
     });
 
-    if !error {
-      jQuery('form :input.rqd').each(function() {
+    if(error === false) {
+      jQuery('form :input').each(function() {
         jQuery(this).prop('disabled', true);
       });
 
