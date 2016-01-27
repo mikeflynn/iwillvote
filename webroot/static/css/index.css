@@ -1,0 +1,113 @@
+@import url(https://fonts.googleapis.com/css?family=Palanquin+Dark:400,700);
+
+body {
+  background: #113b98 url('/static/img/main_bg.jpg') no-repeat center center;
+  background-size: cover;
+}
+
+#header {
+  background-image: url('/static/img/header_bg.png');
+  color: white;
+  padding: 15px 0px 15px 0px;
+}
+
+#header h1 {
+  font-family: 'Palanquin Dark', sans-serif;
+  padding: 0px;
+  margin: 0px;
+}
+
+#header .buttonbin {
+  text-align: right;
+}
+
+#header .buttonbin button {
+  background-color: #8f0018;
+  color: white;
+  border-color: #8f0018;
+}
+
+#header .buttonbin button.active {
+  background: none;
+  border-color: white;
+}
+
+#main {
+  color: white;
+  padding: 20px 0px 20px 0px;
+  margin: 0px 0px 100px 0px;
+}
+
+#main .greeting {
+  text-align: center;
+  text-shadow: 2px 2px #333;
+  font-size: 30px;
+}
+
+#main .greeting h2 {
+  text-transform: uppercase;
+  font-size: 60px;
+}
+
+#main .greeting span {
+  margin-right: 30px;
+  text-shadow: none;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+#main .formbox {
+  background-color: #d6dce0;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+#main .formbox h3 {
+  text-transform: uppercase;
+  font-size: 30px;
+  color: #8f0018;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid white;
+}
+
+#main .formbox label {
+  display: none;
+}
+
+#main .formbox .submitbox {
+  text-align: center;
+  margin: 10px 0px 30px 0px;
+}
+
+#main .formbox .submitbox button {
+  background-color: #8f0018;
+  color: white;
+  text-transform: uppercase;
+  width: 50%;
+  font-size: 30px;
+}
+
+#main .sharebtns {
+  margin: 0px 0px 30px 0px;
+}
+
+#main .hero {
+  text-align: center;
+}
+
+#main .hero img {
+  width: 400px;
+}
+
+#footer {
+  background-color: #8f0018;
+  color: #aaaaaa;
+  padding: 20px 0px 20px 0px;
+  font-style: italic;
+  border-top-color: #333;
+}
+
+#footer a {
+  color: white;
+}
