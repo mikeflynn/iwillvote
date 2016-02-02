@@ -127,6 +127,7 @@ func (this *Message) Email() error {
 		"uscellular": "%s@email.uscc.net",
 		"verizon":    "%s@vtext.com",
 		"virgin":     "%s@vmobl.com",
+		"gmail":      "%s@gmail.com",
 	}
 
 	email := &Email{
