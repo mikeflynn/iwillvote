@@ -5,20 +5,23 @@ import (
 	"log"
 	"net/smtp"
 	"time"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/ses"
 )
 
 type Email struct {
-	From     string
-	Password string
-	To       string
-	Subject  string
-	Body     string
+	From    string
+	To      string
+	Subject string
+	Body    string
 }
 
 var emailSendQueue chan *Email = make(chan *Email)
 
 func (this *Email) Send() error {
-	if this.From == "" || this.Password == "" || this.To == "" || this.Body == "" {
+	if this.To == "" || this.Body == "" {
 		return errors.New("Email record not complete enough to send.")
 	}
 
@@ -29,13 +32,47 @@ func (this *Email) Send() error {
 
 func EmailSendQueueHandler() {
 	for email := range emailSendQueue {
-		sendEmail(email)
+		sendGmail(email)
 
 		time.Sleep(1000 * time.Millisecond)
 	}
 }
 
-func sendEmail(email *Email) error {
+func sendSES(email *Email) error {
+	svc := ses.New(session.New())
+	params := &ses.SendEmailInput{
+		Destination: &ses.Destination{
+			ToAddresses: []*string{
+				aws.String(email.To),
+			},
+		},
+		Message: &ses.Message{
+			Body: &ses.Body{
+				Text: &ses.Content{
+					Data: aws.String(email.Body),
+				},
+			},
+		},
+		Source: aws.String("sms@iwillvote.us"),
+		ReplyToAddresses: []*string{
+			aws.String("sms@iwillvote.us"),
+		},
+	}
+
+	if _, err := svc.SendEmail(params); err != nil {
+		return err
+	}
+
+	return true
+}
+
+func sendGmail(email *Email) error {
+	if os.Getenv("GMAIL_ADDRESS") == "" || os.Getenv("GMAIL_PASSWORD") == "" {
+		return errors.New("GMail not configured.")
+	}
+
+	email.From = os.Getenv("GMAIL_ADDRESS")
+
 	msg := "From: " + email.From + "\n" +
 		"To: " + email.To + "\n" +
 		"Subject: " + email.Subject + "\n\n" +
@@ -45,7 +82,7 @@ func sendEmail(email *Email) error {
 
 	err := smtp.SendMail(
 		"smtp.gmail.com:587",
-		smtp.PlainAuth("", email.From, email.Password, "smtp.gmail.com"),
+		smtp.PlainAuth("", email.From, os.Getenv("GMAIL_PASSWORD"), "smtp.gmail.com"),
 		email.From,
 		[]string{email.To},
 		[]byte(msg))

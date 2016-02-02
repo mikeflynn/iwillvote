@@ -129,16 +129,11 @@ func (this *Message) Email() error {
 		"virgin":     "%s@vmobl.com",
 	}
 
-	if os.Getenv("GMAIL_ADDRESS") == "" || os.Getenv("GMAIL_PASSWORD") == "" {
-		return errors.New("GMail not configured.")
-	}
-
 	email := &Email{
-		From:     os.Getenv("GMAIL_ADDRESS"),
-		Password: os.Getenv("GMAIL_PASSWORD"),
-		To:       fmt.Sprintf(domains[this.Network], this.UUID),
-		Subject:  "",
-		Body:     this.Message,
+		From:    "sms@iwillvote.us",
+		To:      fmt.Sprintf(domains[this.Network], this.UUID),
+		Subject: "",
+		Body:    this.Message,
 	}
 
 	if err := email.Send(); err != nil {
