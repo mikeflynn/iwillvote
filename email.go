@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"net/smtp"
+	"os"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -32,9 +33,13 @@ func (this *Email) Send() error {
 
 func EmailSendQueueHandler() {
 	for email := range emailSendQueue {
-		sendGmail(email)
 
-		time.Sleep(1000 * time.Millisecond)
+		if err := sendSES(email); err != nil {
+			log.Println(err.Error())
+		}
+
+		d, _ := time.ParseDuration("1s")
+		time.Sleep(d)
 	}
 }
 
@@ -52,6 +57,9 @@ func sendSES(email *Email) error {
 					Data: aws.String(email.Body),
 				},
 			},
+			Subject: &ses.Content{
+				Data: aws.String(email.Subject),
+			},
 		},
 		Source: aws.String("sms@iwillvote.us"),
 		ReplyToAddresses: []*string{
@@ -63,7 +71,7 @@ func sendSES(email *Email) error {
 		return err
 	}
 
-	return true
+	return nil
 }
 
 func sendGmail(email *Email) error {
