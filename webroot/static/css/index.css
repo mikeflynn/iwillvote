@@ -21,13 +21,13 @@ body {
   text-align: right;
 }
 
-#header .buttonbin button {
+#header .buttonbin a {
   background-color: #8f0018;
   color: white;
   border-color: #8f0018;
 }
 
-#header .buttonbin button.active {
+#header .buttonbin a.active {
   background: none;
   border-color: white;
 }

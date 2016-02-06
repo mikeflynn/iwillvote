@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"io/ioutil"
+	"html/template"
 	"log"
 	"net/http"
 	"time"
@@ -11,11 +11,18 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// CLI Params
 var Port = flag.String("port", "8080", "Port for web server to run.")
 var WebRoot = flag.String("root", "./webroot/", "The web file root directory.")
 
+// Templates
+var Templates *template.Template
+
 func main() {
 	flag.Parse()
+
+	// Load Templates
+	Templates = template.Must(template.ParseGlob(*WebRoot + "/templates/*"))
 
 	log.Printf("Web root directory set to: %s", *WebRoot)
 
@@ -28,9 +35,6 @@ func main() {
 	// Start web server...
 	r := mux.NewRouter()
 
-	// Index
-	r.HandleFunc("/", pageHandler)
-
 	// Static files
 	r.PathPrefix("/static/").Handler(http.FileServer(http.Dir(*WebRoot)))
 
@@ -38,19 +42,36 @@ func main() {
 	r.HandleFunc("/api/user/add/", addUserHandler).Methods("POST")
 	r.HandleFunc("/api/user/remove/", removeUserHandler).Methods("POST")
 
+	// Index
+	r.HandleFunc("/{page:[a-z]*}", pageHandler)
+
 	log.Println("Web server running on " + *Port)
 
 	http.ListenAndServe(":"+*Port, r)
 }
 
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadFile(*WebRoot + "/index.html")
-	if err != nil {
-		log.Println(err.Error())
+	params := mux.Vars(r)
+
+	page := "index"
+	if v, ok := params["page"]; ok {
+		if v != "" {
+			page = v
+		}
 	}
 
-	w.Header().Set("Content-Type", "text/html")
-	w.Write(body)
+	data := struct {
+		Title string
+	}{
+		Title: "i Will Vote",
+	}
+
+	err := Templates.ExecuteTemplate(w, page, data)
+	if err != nil {
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.NotFound(w, r)
+		return
+	}
 }
 
 func removeUserHandler(w http.ResponseWriter, r *http.Request) {
