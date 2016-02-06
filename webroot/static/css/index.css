@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Palanquin+Dark:400,700);
 
 body {
-  background: #113b98 url('/static/img/main_bg.jpg') no-repeat center center;
+  background: #113b98 url('/static/img/main_bg.jpg') no-repeat center center fixed;
   background-size: cover;
 }
 
