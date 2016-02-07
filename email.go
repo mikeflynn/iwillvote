@@ -38,7 +38,7 @@ func EmailSendQueueHandler() {
 			log.Println(err.Error())
 		}
 
-		d, _ := time.ParseDuration("1s")
+		d, _ := time.ParseDuration("200ms")
 		time.Sleep(d)
 	}
 }
