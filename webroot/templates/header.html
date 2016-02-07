@@ -1,0 +1,27 @@
+{{define "header"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>{{.Title}}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/index.css">
+</head>
+<body>
+  <div id="header">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-5">
+          <h1>i Will Vote</h1>
+        </div>
+        <div class="col-md-5 col-md-offset-2 buttonbin">
+          <a class="btn btn-default active" href="/">Home</a>
+          <a class="btn btn-default" href="/candidates">Candidates</a>
+          <a class="btn btn-default" href="/faq">FAQ</a>
+          <a class="btn btn-default" href="/terms">Terms</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{{end}}
