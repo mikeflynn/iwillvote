@@ -114,6 +114,19 @@ body {
   width: 400px;
 }
 
+#main .sharebtns {
+  text-align: center;
+}
+
+#main .sharebtns .fb {
+  margin-bottom: 10px;
+}
+
+#main .sharebtns .tw {
+  background: #00aced;
+  margin-bottom: 10px;
+}
+
 #footer {
   background-color: #8f0018;
   color: #aaaaaa;
