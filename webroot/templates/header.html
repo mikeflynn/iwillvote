@@ -38,8 +38,9 @@
             <li class="dropdown">
               <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Candidates <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a class="btn btn-default" href="#">Action</a></li>
-                <li><a class="btn btn-default" href="#">Another action</a></li>
+                {{range $k, $v := .CandidateList}}
+                <li><a class="btn btn-default" href="/{{$k}}">{{$k}}</a></li>
+                {{end}}
               </ul>
             </li>
             <li class="{{if eq .Active "faq"}}active{{end}}"><a class="btn btn-default" href="/faq">FAQ</a></li>

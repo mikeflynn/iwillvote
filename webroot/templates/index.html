@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-6 {{if eq .Candidate ""}}col-md-offset-3{{end}} formbox">
+        <div class="col-md-7 {{if eq .Candidate ""}}col-md-offset-3{{end}} formbox">
           <h3>Okay, I promise to vote!<br /> Remind me!</h3>
           <form>
             <div class="row">
@@ -101,6 +101,7 @@
               </div>
             </div>
             <div class="row submitbox">
+              <input type="hidden" id="landingInput" name="landing_page" value="{{.Candidate}}" />
               <button type="submit" class="btn btn-default btn-lg submit">Submit</button>
             </div>
             <div class="row sharebtns">
@@ -119,9 +120,7 @@
           </form>
         </div>
         {{if ne .Candidate ""}}
-        <div class="col-md-5 col-md-offset-1 hero">
-          <img src="/static/img/candidate_{{.Candidate}}.png" />
-        </div>
+        <div class="col-md-4 col-md-offset-1 hero" style="background-image: url('/static/img/candidates/{{.Candidate}}.jpg');"></div>
         {{end}}
       </div>
     </div>

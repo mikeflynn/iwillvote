@@ -24,7 +24,8 @@ jQuery(document).ready(function() {
           uuid: jQuery('#uuidInput').val(),
           network: jQuery('#networkInput').val(),
           state: jQuery('#stateInput').val(),
-          window: jQuery('#windowInput').val()
+          window: jQuery('#windowInput').val(),
+          landing_page: jQuery('#landingInput').val()
         },
         success: function(data) {
           alert("Yeah bro!");

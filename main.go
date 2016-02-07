@@ -52,11 +52,15 @@ func main() {
 
 func pageHandler(w http.ResponseWriter, r *http.Request) {
 	candidates := map[string]bool{
-		"clinton": true,
-		"sanders": true,
-		"cruz":    true,
-		"trump":   true,
-		"rubio":   true,
+		"clinton":  true,
+		"sanders":  true,
+		"cruz":     true,
+		"carson":   true,
+		"fiorina":  true,
+		"christie": true,
+		"trump":    true,
+		"rubio":    true,
+		"bush":     true,
 	}
 
 	params := mux.Vars(r)
@@ -74,13 +78,15 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := struct {
-		Title     string
-		Active    string
-		Candidate string
+		Title         string
+		Active        string
+		Candidate     string
+		CandidateList map[string]bool
 	}{
-		Title:     "i Will Vote",
-		Active:    page,
-		Candidate: candidate,
+		Title:         "i Will Vote",
+		Active:        page,
+		Candidate:     candidate,
+		CandidateList: candidates,
 	}
 
 	err := Templates.ExecuteTemplate(w, page, data)
@@ -131,6 +137,7 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 		Name:          r.FormValue("name"),
 		State:         r.FormValue("state"),
 		MessageWindow: r.FormValue("window"),
+		LandingPage:   r.FormValue("landing_page"),
 	}
 
 	err = user.Load()
