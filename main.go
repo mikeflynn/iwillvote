@@ -51,24 +51,41 @@ func main() {
 }
 
 func pageHandler(w http.ResponseWriter, r *http.Request) {
+	candidates := map[string]bool{
+		"clinton": true,
+		"sanders": true,
+		"cruz":    true,
+		"trump":   true,
+		"rubio":   true,
+	}
+
 	params := mux.Vars(r)
 
+	candidate := ""
 	page := "index"
 	if v, ok := params["page"]; ok {
 		if v != "" {
-			page = v
+			if candidates[v] {
+				candidate = v
+			} else {
+				page = v
+			}
 		}
 	}
 
 	data := struct {
-		Title string
+		Title     string
+		Active    string
+		Candidate string
 	}{
-		Title: "i Will Vote",
+		Title:     "i Will Vote",
+		Active:    page,
+		Candidate: candidate,
 	}
 
 	err := Templates.ExecuteTemplate(w, page, data)
 	if err != nil {
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Println(err.Error())
 		http.NotFound(w, r)
 		return
 	}

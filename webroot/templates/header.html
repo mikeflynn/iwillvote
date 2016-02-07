@@ -10,18 +10,37 @@
 </head>
 <body>
   <div id="header">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-5">
-          <h1>i Will Vote</h1>
+    <nav class="navbar">
+      <div class="container">
+
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">i Will Vote</a>
         </div>
-        <div class="col-md-5 col-md-offset-2 buttonbin">
-          <a class="btn btn-default active" href="/">Home</a>
-          <a class="btn btn-default" href="/candidates">Candidates</a>
-          <a class="btn btn-default" href="/faq">FAQ</a>
-          <a class="btn btn-default" href="/terms">Terms</a>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right buttonbin">
+            <li class="{{if eq .Active "index"}}active{{end}}">
+              <a class="btn btn-default" href="/">Home <span class="sr-only">Home</span></a>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Candidates <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a class="btn btn-default" href="#">Action</a></li>
+                <li><a class="btn btn-default" href="#">Another action</a></li>
+              </ul>
+            </li>
+            <li class="{{if eq .Active "faq"}}active{{end}}"><a class="btn btn-default" href="/faq">FAQ</a></li>
+            <li class="{{if eq .Active "terms"}}active{{end}}"><a class="btn btn-default" href="/terms">Terms</a></li>
+          </ul>
         </div>
+
       </div>
-    </div>
+    </nav>
   </div>
 {{end}}

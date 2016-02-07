@@ -11,25 +11,38 @@ body {
   padding: 15px 0px 15px 0px;
 }
 
-#header h1 {
+#header .navbar-brand {
   font-family: 'Palanquin Dark', sans-serif;
   padding: 0px;
-  margin: 0px;
+  margin: 10px 0px 0px 0px;
+  font-size: 36px;
+  color: white;
 }
 
-#header .buttonbin {
-  text-align: right;
-}
-
-#header .buttonbin a {
+#header .buttonbin a.btn {
   background-color: #8f0018;
   color: white;
   border-color: #8f0018;
+  margin-left: 10px;
 }
 
-#header .buttonbin a.active {
+#header .buttonbin li.active a.btn {
   background: none;
   border-color: white;
+}
+
+#header .icon-bar {
+  background-color: white;
+}
+
+#header ul.dropdown-menu {
+  box-shadow: none;
+  border: none;
+  background: none;
+}
+
+#header ul.dropdown-menu li {
+  margin-bottom: 5px;
 }
 
 #main {
@@ -93,6 +106,7 @@ body {
 }
 
 #main .hero {
+  display: none;
   text-align: center;
 }
 
@@ -110,4 +124,8 @@ body {
 
 #footer a {
   color: white;
+}
+
+@media (min-width: 990px) {
+  #main .hero { display: block; }
 }
