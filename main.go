@@ -29,9 +29,6 @@ func main() {
 	// Start message service...
 	go sendService()
 
-	// Start email queue handler...
-	go EmailSendQueueHandler()
-
 	// Start web server...
 	r := mux.NewRouter()
 
@@ -179,6 +176,10 @@ type webUserResponse struct {
 }
 
 func sendService() {
+	// Start email queue handler...
+	go EmailSendQueueHandler()
+
+	// Load it up!
 	for {
 		log.Println("Getting scheduled messages.")
 
