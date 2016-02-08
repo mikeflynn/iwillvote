@@ -4,7 +4,12 @@ import (
 	"crypto/sha1"
 	"fmt"
 	"log"
+	"net/http"
+	"os"
 	"time"
+
+	"github.com/google/google-api-go-client/googleapi/transport"
+	urlshortener "google.golang.org/api/urlshortener/v1"
 )
 
 type Link struct {
@@ -64,6 +69,27 @@ func (this *Link) Load() error {
 	}
 
 	return nil
+}
+
+func (this *Link) Shorten() (string, error) {
+	client := &http.Client{
+		Transport: &transport.APIKey{Key: os.Getenv("GOOGLE_API_KEY")},
+	}
+
+	svc, err := urlshortener.New(client)
+	if err != nil {
+		log.Fatalf("Unable to create UrlShortener service: %v", err)
+	}
+
+	url, err := svc.Url.Insert(&urlshortener.Url{
+		Kind:    "urlshortener#url",
+		LongUrl: "http://iwillvote.us/?code=" + this.Hash,
+	}).Do()
+	if err != nil {
+		log.Fatalf("URL Insert: %v", err)
+	}
+
+	return url.Id, nil
 }
 
 func makeHash() string {
