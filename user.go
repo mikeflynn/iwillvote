@@ -110,3 +110,9 @@ func (this *User) Load() error {
 
 	return nil
 }
+
+func (this *User) Unsubscribe() error {
+	this.Deleted = 1
+	err := this.Save()
+	return err
+}

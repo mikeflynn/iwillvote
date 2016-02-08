@@ -18,6 +18,19 @@ var WebRoot = flag.String("root", "./webroot/", "The web file root directory.")
 // Templates
 var Templates *template.Template
 
+// Candidates
+var Candidates map[string]bool = map[string]bool{
+	"clinton":  true,
+	"sanders":  true,
+	"cruz":     true,
+	"carson":   true,
+	"fiorina":  true,
+	"christie": true,
+	"trump":    true,
+	"rubio":    true,
+	"bush":     true,
+}
+
 func main() {
 	flag.Parse()
 
@@ -39,7 +52,8 @@ func main() {
 	r.HandleFunc("/api/user/add/", addUserHandler).Methods("POST")
 	r.HandleFunc("/api/user/remove/", removeUserHandler).Methods("POST")
 
-	// Index
+	// Pages
+	r.HandleFunc("/unsubscribe", unsubHandler)
 	r.HandleFunc("/{page:[a-z]*}", pageHandler)
 
 	log.Println("Web server running on " + *Port)
@@ -48,25 +62,13 @@ func main() {
 }
 
 func pageHandler(w http.ResponseWriter, r *http.Request) {
-	candidates := map[string]bool{
-		"clinton":  true,
-		"sanders":  true,
-		"cruz":     true,
-		"carson":   true,
-		"fiorina":  true,
-		"christie": true,
-		"trump":    true,
-		"rubio":    true,
-		"bush":     true,
-	}
-
 	params := mux.Vars(r)
 
 	candidate := ""
 	page := "index"
 	if v, ok := params["page"]; ok {
 		if v != "" {
-			if candidates[v] {
+			if Candidates[v] {
 				candidate = v
 			} else {
 				page = v
@@ -83,10 +85,60 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		Title:         "i Will Vote",
 		Active:        page,
 		Candidate:     candidate,
-		CandidateList: candidates,
+		CandidateList: Candidates,
 	}
 
 	err := Templates.ExecuteTemplate(w, page, data)
+	if err != nil {
+		log.Println(err.Error())
+		http.NotFound(w, r)
+		return
+	}
+}
+
+func unsubHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	message := ""
+	errorText := ""
+
+	params := mux.Vars(r)
+
+	if code, ok := params["verify"]; ok {
+		link := &Link{Hash: code}
+		if err = link.Load(); err == nil {
+			if link.Action == "unsubscribe" {
+				user := &User{ID: link.UserID}
+				if err = user.Load(); err == nil {
+					if err = user.Unsubscribe(); err == nil {
+						message = "You have successfully been unsubscribed! Please remember to vote a different way."
+					}
+				}
+			}
+		}
+
+		if err != nil {
+			errorText = err.Error()
+		}
+	}
+
+	data := struct {
+		Title         string
+		Active        string
+		Candidate     string
+		CandidateList map[string]bool
+		Message       string
+		Error         string
+	}{
+		Title:         "i Will Vote",
+		Active:        "unsubscribe",
+		Candidate:     "",
+		CandidateList: Candidates,
+		Message:       message,
+		Error:         errorText,
+	}
+
+	err = Templates.ExecuteTemplate(w, "unsubscribe", data)
 	if err != nil {
 		log.Println(err.Error())
 		http.NotFound(w, r)
