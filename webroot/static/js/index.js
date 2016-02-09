@@ -28,10 +28,10 @@ jQuery(document).ready(function() {
           landing_page: jQuery('#landingInput').val()
         },
         success: function(data) {
-          alert("Yeah bro!");
+          jQuery("form#addUser").parent().prepend("<div class=\"alert alert-success\" role=\"alert\">You're all set! We'll remind you when it's time to vote!</alert>");
         },
         error: function() {
-          alert("There was a problem creating your account.");
+          jQuery("form#addUser").parent().prepend("<div class=\"alert alert-warning\" role=\"alert\">We're having trouble creating your account. Please try again later.</alert>");
         }
       });
     }

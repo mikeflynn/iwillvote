@@ -183,7 +183,7 @@ func unsubHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				if err = msg.Send(); err == nil {
-					message = "We have sent you a link to complete your request."
+					message = "If this matches a user in our system we will send a verification link to complete your request."
 				}
 			}
 		}
@@ -191,30 +191,10 @@ func unsubHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println(err.Error())
-		errorText = "We couldn't complete your unsubscribe action at this time. Please try again in a moment."
+		message = "If this matches a user in our system we will send a verification link to complete your request."
+		//errorText = "We couldn't complete your unsubscribe action at this time. Please try again in a moment."
 	}
 
-	/*
-		params := mux.Vars(r)
-
-		if code, ok := params["verify"]; ok {
-			link := &Link{Hash: code}
-			if err = link.Load(); err == nil {
-				if link.Action == "unsubscribe" {
-					user := &User{ID: link.UserID}
-					if err = user.Load(); err == nil {
-						if err = user.Unsubscribe(); err == nil {
-							message = "You have successfully been unsubscribed! Please remember to vote a different way."
-						}
-					}
-				}
-			}
-
-			if err != nil {
-				errorText = err.Error()
-			}
-		}
-	*/
 	data := struct {
 		Title         string
 		Active        string
