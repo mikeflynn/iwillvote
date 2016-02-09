@@ -108,6 +108,10 @@ func (this *User) Load() error {
 		}
 	}
 
+	if this.CreatedOn == "" || this.Deleted == 1 {
+		return errors.New("User not found or deleted.")
+	}
+
 	return nil
 }
 

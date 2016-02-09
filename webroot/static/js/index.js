@@ -1,9 +1,9 @@
 jQuery(document).ready(function() {
-  jQuery("form").submit(function(event) {
+  jQuery("form#addUser").submit(function(event) {
     event.preventDefault();
     var error = false;
 
-    jQuery('form :input.rqd').each(function() {
+    jQuery('form#addUser :input.rqd').each(function() {
       if(jQuery(this).val() == "") {
         error = true;
         jQuery(this).parent().addClass('has-error');
@@ -11,7 +11,7 @@ jQuery(document).ready(function() {
     });
 
     if(error === false) {
-      jQuery('form :input').each(function() {
+      jQuery('form#addUser :input').each(function() {
         jQuery(this).prop('disabled', true);
       });
 

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -53,7 +54,8 @@ func main() {
 	r.HandleFunc("/api/user/remove/", removeUserHandler).Methods("POST")
 
 	// Pages
-	r.HandleFunc("/unsubscribe", unsubHandler)
+	r.HandleFunc("/unsubscribe", unsubHandler).Methods("POST", "GET")
+	r.HandleFunc("/code/{code:[0-9a-f]{5,40}}", codeHandler)
 	r.HandleFunc("/{page:[a-z]*}", pageHandler)
 
 	log.Println("Web server running on " + *Port)
@@ -96,32 +98,123 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func codeHandler(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var message, errorText string
+
+	params := mux.Vars(r)
+
+	link := &Link{
+		Hash: params["code"],
+	}
+
+	err = link.Load()
+	expired, _ := link.IsExpired()
+	if err != nil || expired {
+		log.Println(fmt.Sprintf("Code not found: %s", params["code"]))
+		http.NotFound(w, r)
+		return
+	}
+
+	link.Click()
+
+	switch link.Action {
+	case "unsubscribe":
+		user := &User{ID: link.UserID}
+		if err = user.Load(); err == nil {
+			if err = user.Unsubscribe(); err == nil {
+				message = "You have successfully been unsubscribed! Please remember to vote a different way."
+
+				link.Expire()
+			}
+		}
+	}
+
+	data := struct {
+		Title         string
+		Active        string
+		Candidate     string
+		CandidateList map[string]bool
+		Message       string
+		Error         string
+	}{
+		Title:         "i Will Vote",
+		Active:        "",
+		Candidate:     "",
+		CandidateList: Candidates,
+		Message:       message,
+		Error:         errorText,
+	}
+
+	err = Templates.ExecuteTemplate(w, "code", data)
+	if err != nil {
+		log.Println(err.Error())
+		http.NotFound(w, r)
+		return
+	}
+}
+
 func unsubHandler(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	message := ""
 	errorText := ""
 
-	params := mux.Vars(r)
+	err = r.ParseForm()
+	if err == nil && r.FormValue("uuid") != "" {
+		user := &User{
+			UUID:    r.FormValue("uuid"),
+			Network: r.FormValue("network"),
+		}
 
-	if code, ok := params["verify"]; ok {
-		link := &Link{Hash: code}
-		if err = link.Load(); err == nil {
-			if link.Action == "unsubscribe" {
-				user := &User{ID: link.UserID}
-				if err = user.Load(); err == nil {
-					if err = user.Unsubscribe(); err == nil {
-						message = "You have successfully been unsubscribed! Please remember to vote a different way."
-					}
+		if err = user.Load(); err == nil {
+			link := &Link{
+				Action:    "unsubscribe",
+				UserID:    user.ID,
+				ExpiresIn: 3600,
+			}
+
+			if err = link.Save(); err == nil {
+				msg := &Message{
+					Network:  user.Network,
+					UUID:     user.UUID,
+					Message:  fmt.Sprintf("We have received a request to unsubscribe you from iWillVote.us. Tap on this link to complete the process http://iwillvote.us/code/%s, or do nothing if you don't want to unsubscribe.", link.Hash),
+					Outgoing: 1,
+				}
+
+				if err = msg.Send(); err == nil {
+					message = "We have sent you a link to complete your request."
 				}
 			}
 		}
-
-		if err != nil {
-			errorText = err.Error()
-		}
 	}
 
+	if err != nil {
+		log.Println(err.Error())
+		errorText = "We couldn't complete your unsubscribe action at this time. Please try again in a moment."
+	}
+
+	/*
+		params := mux.Vars(r)
+
+		if code, ok := params["verify"]; ok {
+			link := &Link{Hash: code}
+			if err = link.Load(); err == nil {
+				if link.Action == "unsubscribe" {
+					user := &User{ID: link.UserID}
+					if err = user.Load(); err == nil {
+						if err = user.Unsubscribe(); err == nil {
+							message = "You have successfully been unsubscribed! Please remember to vote a different way."
+						}
+					}
+				}
+			}
+
+			if err != nil {
+				errorText = err.Error()
+			}
+		}
+	*/
 	data := struct {
 		Title         string
 		Active        string
