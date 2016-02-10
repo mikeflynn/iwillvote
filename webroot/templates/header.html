@@ -5,7 +5,7 @@
   <title>{{.Title}}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta property="og:url" content="http://iwillvote.us/{{.Active}}" />
+  <meta property="og:url" content="http://iwillvote.us/{{if ne .Active "index"}}{{.Active}}{{else}}{{.Candidate}}{{end}}" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="I Will Vote" />
   <meta property="og:description" content="Voting is your democratic right and responsibility, but it's easy to forget, so we'll remind you!" />
