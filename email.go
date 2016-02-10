@@ -2,13 +2,17 @@ package main
 
 import (
 	"errors"
+	"io/ioutil"
 	"log"
+	"net/mail"
 	"net/smtp"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/ses"
 )
 
@@ -41,6 +45,74 @@ func EmailSendQueueHandler() {
 		d, _ := time.ParseDuration("200ms")
 		time.Sleep(d)
 	}
+}
+
+// Gets emails from S3, saves them as messages.
+func ProcessS3Emails(bucketName string, limit int64) (int, error) {
+	svc := s3.New(session.New())
+
+	params := &s3.ListObjectsInput{
+		Bucket:  aws.String(bucketName),
+		MaxKeys: aws.Int64(limit),
+	}
+
+	resp, err := svc.ListObjects(params)
+	if err != nil {
+		return 0, err
+	}
+
+	for _, obj := range resp.Contents {
+
+		// Get the S3 object
+		params := &s3.GetObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(*obj.Key),
+		}
+
+		resp, err := svc.GetObject(params)
+
+		if err != nil {
+			log.Println(err.Error())
+			continue
+		}
+
+		// Parse the email
+		m, err := mail.ReadMessage(resp.Body)
+		if err != nil {
+			log.Println(err.Error())
+			continue
+		}
+
+		body, _ := ioutil.ReadAll(m.Body)
+
+		from := strings.Split(m.Header.Get("From"), "@")
+
+		// Save the message
+		msg := &Message{
+			Network:  DomainToNetwork(from[1]),
+			UUID:     from[0],
+			Message:  string(body),
+			Outgoing: 0,
+		}
+
+		if err := msg.Save(); err != nil {
+			log.Println(err.Error())
+			continue
+		}
+
+		// Remove the object
+		delParams := &s3.DeleteObjectInput{
+			Bucket: aws.String(bucketName),
+			Key:    aws.String(*obj.Key),
+		}
+
+		if _, err := svc.DeleteObject(delParams); err != nil {
+			log.Println(err.Error())
+			continue
+		}
+	}
+
+	return len(resp.Contents), nil
 }
 
 func sendSES(email *Email) error {

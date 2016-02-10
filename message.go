@@ -117,21 +117,9 @@ func (this *Message) Send() error {
 }
 
 func (this *Message) Email() error {
-	domains := map[string]string{
-		"att":        "%s@txt.att.net",
-		"metropcs":   "%s@mymetropcs.com",
-		"sprint":     "%s@messaging.sprintpcs.com",
-		"tmobile":    "%s@tmomail.net",
-		"tracfone":   "%s@txt.att.net",
-		"uscellular": "%s@email.uscc.net",
-		"verizon":    "%s@vtext.com",
-		"virgin":     "%s@vmobl.com",
-		"gmail":      "%s@gmail.com",
-	}
-
 	email := &Email{
 		From:    "sms@iwillvote.us",
-		To:      fmt.Sprintf(domains[this.Network], this.UUID),
+		To:      fmt.Sprintf(NetworkToDomain(this.Network), this.UUID),
 		Subject: "",
 		Body:    this.Message,
 	}
@@ -141,4 +129,34 @@ func (this *Message) Email() error {
 	}
 
 	return nil
+}
+
+var messageDomains map[string]string = map[string]string{
+	"att":        "%s@txt.att.net",
+	"metropcs":   "%s@mymetropcs.com",
+	"sprint":     "%s@messaging.sprintpcs.com",
+	"tmobile":    "%s@tmomail.net",
+	"tracfone":   "%s@txt.att.net",
+	"uscellular": "%s@email.uscc.net",
+	"verizon":    "%s@vtext.com",
+	"virgin":     "%s@vmobl.com",
+	"gmail":      "%s@gmail.com",
+}
+
+func NetworkToDomain(network string) string {
+	if v, ok := messageDomains[network]; ok {
+		return v
+	}
+
+	return ""
+}
+
+func DomainToNetwork(domain string) string {
+	for network, match := range messageDomains {
+		if match == "%s@"+domain {
+			return network
+		}
+	}
+
+	return ""
 }

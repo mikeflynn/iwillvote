@@ -41,8 +41,9 @@ func main() {
 
 	log.Printf("Web root directory set to: %s", *WebRoot)
 
-	// Start message service...
+	// Start message services...
 	go sendService()
+	go receiveService()
 
 	// Start web server...
 	r := mux.NewRouter()
@@ -321,5 +322,22 @@ func sendService() {
 		}
 
 		time.Sleep(1000 * time.Millisecond * 60 * 10) // 10 minutes
+	}
+}
+
+func receiveService() {
+	for {
+		var count int
+		var err error
+
+		log.Println("Checking for received messages.")
+
+		if count, err = ProcessS3Emails("iwillvote-sms", 10); err != nil {
+			log.Println(err.Error())
+		}
+
+		log.Printf("Found %d messages.\n", count)
+
+		time.Sleep(1000 * time.Millisecond * 60 * 10) // 5 minutes
 	}
 }
