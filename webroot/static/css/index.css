@@ -151,4 +151,6 @@ body {
 
 @media (min-width: 990px) {
   #main .hero { display: block; }
+  #header .navbar-brand { margin-left: 10px; }
+  #main .formbox { margin: 0px 10px 0px 10px; }
 }
