@@ -8,7 +8,7 @@ body {
 #header {
   background-image: url('/static/img/header_bg.png');
   color: white;
-  padding: 15px 0px 15px 0px;
+  padding: 15px 0px 0px 0px;
 }
 
 #header .navbar-brand {
@@ -19,31 +19,43 @@ body {
   color: white;
 }
 
-#header .buttonbin a.btn {
-  background-color: #8f0018;
-  color: white;
-  border-color: #8f0018;
-  margin-left: 10px;
+#header .buttonbin a {
   text-transform: capitalize;
+  color: white;
 }
 
-#header .buttonbin li.active a.btn {
+#header .buttonbin li a {
+  border: 1px solid transparent;
+}
+
+#header .buttonbin li a:hover,
+#header .buttonbin li.active a {
+  border: 1px solid white;
+  border-radius: 5px;
   background: none;
-  border-color: white;
+}
+
+#header ul.dropdown-menu li a {
+  color: blue;
+}
+
+#header ul.dropdown-menu {
+  border-radius: 5px;
+}
+
+#header ul.dropdown-menu li a:hover {
+
+}
+
+#header .nav .open>a, .nav .open>a:focus,
+#header .nav .open>a:hover {
+  border: 1px solid white;
+  border-radius: 5px;
+  background: none;
 }
 
 #header .icon-bar {
   background-color: white;
-}
-
-#header ul.dropdown-menu {
-  box-shadow: none;
-  border: none;
-  background: none;
-}
-
-#header ul.dropdown-menu li {
-  margin-bottom: 5px;
 }
 
 #main {
@@ -151,6 +163,10 @@ body {
 
 @media (min-width: 990px) {
   #main .hero { display: block; }
+}
+
+@media (max-width: 990px) {
   #header .navbar-brand { margin-left: 10px; }
   #main .formbox { margin: 0px 10px 0px 10px; }
+  #header ul.dropdown-menu li a { color: white; }
 }

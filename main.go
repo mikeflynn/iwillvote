@@ -30,6 +30,7 @@ var Candidates map[string]bool = map[string]bool{
 	"trump":    true,
 	"rubio":    true,
 	"bush":     true,
+	"kodos":    true,
 }
 
 func main() {

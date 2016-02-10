@@ -3,7 +3,7 @@
   <div id="main">
     <div class="container">
       <div class="row greeting">
-        <div class="col-md-12">
+        <div class="{{if eq .Candidate ""}}col-md-8 col-md-offset-2{{else}}col-md-12{{end}}">
           <h2>Remember to Vote!</h2>
           <p>Voting is your democratic right and responsibility</p>
           <p>But it's easy to forget, so we'll remind you!</p>
@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-md-7 {{if eq .Candidate ""}}col-md-offset-3{{end}} formbox">
+        <div class="{{if eq .Candidate ""}}col-md-8 col-md-offset-2{{else}}col-md-7{{end}} formbox">
           <h3>Okay, I promise to vote!<br /> Remind me!</h3>
           <form id="addUser">
             <div class="row">
@@ -94,8 +94,13 @@
                   <select id="networkInput" class="form-control rqd">
                     <option>Choose Your Phone Carrier</option>
                     <option value="att">AT&T</option>
-                    <option value="verizon">Verizon</option>
+                    <option value="metropcs">Metro PCS</option>
+                    <option value="sprint">Sprint</option>
                     <option value="tmobile">T-Mobile</option>
+                    <option value="tracfone">Tracfone</option>
+                    <option value="uscellular">US Cellular</option>
+                    <option value="verizon">Verizon</option>
+                    <option value="virgin">Virgin Mobile</option>
                   </select>
                 </div>
               </div>

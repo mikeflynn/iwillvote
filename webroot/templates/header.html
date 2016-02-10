@@ -5,11 +5,16 @@
   <title>{{.Title}}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <meta property="og:url"           content="http://iwillvote.us" />
-  <meta property="og:type"          content="website" />
-  <meta property="og:title"         content="I Will Vote" />
-  <meta property="og:description"   content="Voting is your democratic right and responsibility, but it's easy to forget, so we'll remind you!" />
-  <!-- <meta property="og:image"         content="http://www.your-domain.com/path/image.jpg" /> -->
+  <meta property="og:url" content="http://iwillvote.us/{{.Active}}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="I Will Vote" />
+  <meta property="og:description" content="Voting is your democratic right and responsibility, but it's easy to forget, so we'll remind you!" />
+  {{if ne .Candidate ""}}
+  <meta property="og:image" content="http://iwillvote.us/static/img/candidates/{{.Candidate}}.jpg" />
+  {{end}}
+  <meta name="twitter:card" content="product" />
+  <!-- <meta name="twitter:site" content="@nytimesbits" /> -->
+  <meta name="twitter:creator" content="@thatmikeflynn" />
 
   <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
@@ -33,19 +38,19 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav navbar-right buttonbin">
             <li class="{{if eq .Active "index"}}active{{end}}">
-              <a class="btn btn-default" href="/">Home <span class="sr-only">Home</span></a>
+              <a class="" href="/">Home <span class="sr-only">Home</span></a>
             </li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle btn btn-default" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Candidates <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle " data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Candidates <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 {{range $k, $v := .CandidateList}}
-                <li><a class="btn btn-default" href="/{{$k}}">{{$k}}</a></li>
+                <li><a class="" href="/{{$k}}">{{$k}}</a></li>
                 {{end}}
               </ul>
             </li>
-            <li class="{{if eq .Active "faq"}}active{{end}}"><a class="btn btn-default" href="/faq">FAQ</a></li>
-            <li class="{{if eq .Active "terms"}}active{{end}}"><a class="btn btn-default" href="/terms">Terms</a></li>
-            <li class="{{if eq .Active "unsubscribe"}}active{{end}}"><a class="btn btn-default" href="/unsubscribe">Unsubscribe</a></li>
+            <li class="{{if eq .Active "faq"}}active{{end}}"><a class="" href="/faq">FAQ</a></li>
+            <li class="{{if eq .Active "terms"}}active{{end}}"><a class="" href="/terms">Terms</a></li>
+            <li class="{{if eq .Active "unsubscribe"}}active{{end}}"><a class="" href="/unsubscribe">Unsubscribe</a></li>
           </ul>
         </div>
 
