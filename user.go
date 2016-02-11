@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"log"
+	"regexp"
 )
 
 type User struct {
@@ -24,12 +25,17 @@ type User struct {
 //
 //}
 
-func (this *User) IsComplete() bool {
-	if this.Network != "" && this.UUID != "" && this.Name != "" && this.State != "" {
-		return true
+func (this *User) IsComplete() error {
+	if this.Network != "" && this.UUID != "" {
+		_, err := regexp.MatchString("^\\d{10}$", this.UUID)
+		if err == nil {
+			return nil
+		} else {
+			return errors.New("Invalid phone number UUID.")
+		}
+	} else {
+		return errors.New("Missing one or more required fields.")
 	}
-
-	return false
 }
 
 func (this *User) Save() error {

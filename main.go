@@ -169,23 +169,25 @@ func unsubHandler(w http.ResponseWriter, r *http.Request) {
 			Network: r.FormValue("network"),
 		}
 
-		if err = user.Load(); err == nil {
-			link := &Link{
-				Action:    "unsubscribe",
-				UserID:    user.ID,
-				ExpiresIn: 3600,
-			}
-
-			if err = link.Save(); err == nil {
-				msg := &Message{
-					Network:  user.Network,
-					UUID:     user.UUID,
-					Message:  fmt.Sprintf("We have received a request to unsubscribe you from iWillVote.us. Tap on this link to complete the process http://iwillvote.us/code/%s, or do nothing if you don't want to unsubscribe.", link.Hash),
-					Outgoing: 1,
+		if err = user.IsComplete(); err == nil {
+			if err = user.Load(); err == nil {
+				link := &Link{
+					Action:    "unsubscribe",
+					UserID:    user.ID,
+					ExpiresIn: 3600,
 				}
 
-				if err = msg.Send(); err == nil {
-					message = "If this matches a user in our system we will send a verification link to complete your request."
+				if err = link.Save(); err == nil {
+					msg := &Message{
+						Network:  user.Network,
+						UUID:     user.UUID,
+						Message:  fmt.Sprintf("We have received a request to unsubscribe you from iWillVote.us. Tap on this link to complete the process http://iwillvote.us/code/%s, or do nothing if you don't want to unsubscribe.", link.Hash),
+						Outgoing: 1,
+					}
+
+					if err = msg.Send(); err == nil {
+						message = "If this matches a user in our system we will send a verification link to complete your request."
+					}
 				}
 			}
 		}
@@ -232,6 +234,10 @@ func removeUserHandler(w http.ResponseWriter, r *http.Request) {
 		UUID:    r.FormValue("uuid"),
 	}
 
+	if err = user.IsComplete(); err != nil {
+		jsonBytes, _ = json.Marshal(webError{Error: err.Error()})
+	}
+
 	err = user.Load()
 	if user.ID != 0 {
 		user.Deleted = 1
@@ -262,6 +268,10 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 		State:         r.FormValue("state"),
 		MessageWindow: r.FormValue("window"),
 		LandingPage:   r.FormValue("landing_page"),
+	}
+
+	if err = user.IsComplete(); err != nil {
+		jsonBytes, _ = json.Marshal(webError{Error: err.Error()})
 	}
 
 	err = user.Load()
