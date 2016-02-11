@@ -1,14 +1,8 @@
 jQuery(document).ready(function() {
   jQuery("form#addUser").submit(function(event) {
     event.preventDefault();
-    var error = false;
 
-    jQuery('form#addUser :input.rqd').each(function() {
-      if(jQuery(this).val() == "") {
-        error = true;
-        jQuery(this).parent().addClass('has-error');
-      }
-    });
+    var error = verifyForm("addUser")
 
     if(error === false) {
       jQuery('form#addUser :input').each(function() {
@@ -38,4 +32,43 @@ jQuery(document).ready(function() {
 
     return false;
   });
+
+  jQuery("form#unsubUser").submit(function(event) {
+    event.preventDefault();
+    var error = verifyForm("unsubUser");
+
+    if(!error) {
+      return true;
+    }
+
+    return false;
+  });
 });
+
+function verifyForm(formID) {
+  jQuery("form#"+formID).siblings(".alert").remove();
+  jQuery('form#'+formID+' :input.rqd').parent().removeClass('has-error');
+
+  var error = false
+
+  jQuery('form#'+formID+' :input.rqd').each(function() {
+    if(jQuery(this).val() == "") {
+      jQuery(this).parent().addClass('has-error');
+      error = "You are missing one or more required fields.";
+    }
+  });
+
+  if(!error) {
+    if(/^\d{10}$/.test(jQuery('#uuidInput').val()) == false) {
+      jQuery('#uuidInput').parent().addClass('has-error');
+      error = "Phone numbers should only consist of 10 numbers. No spaces or symbols.";
+    }
+  }
+
+  if(error) {
+    jQuery("form#"+formID).parent().prepend("<div class=\"alert alert-danger\" role=\"alert\">"+error+"</alert>");
+    return error;
+  }
+
+  return false
+}
