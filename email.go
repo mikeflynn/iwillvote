@@ -100,6 +100,8 @@ func ProcessS3Emails(bucketName string, limit int64) (int, error) {
 			continue
 		}
 
+		// Push to message process queue...
+
 		// Remove the object
 		delParams := &s3.DeleteObjectInput{
 			Bucket: aws.String(bucketName),
