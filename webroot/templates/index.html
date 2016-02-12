@@ -106,8 +106,9 @@
               </div>
             </div>
             <div class="row submitbox">
-              <input type="checkbox" name="tos" value="true" class="rqd" /> I agree to the <a href="/tos">terms of service</a>.
-              <br />
+              <div class="form-group toscheck">
+                <input type="checkbox" name="tos" value="true" class="rqd" /> I agree to the <a href="/terms">terms of service</a>
+              </div>
               <input type="hidden" id="landingInput" name="landing_page" value="{{.Candidate}}" />
               <button type="submit" class="btn btn-default btn-lg submit">Submit</button>
             </div>

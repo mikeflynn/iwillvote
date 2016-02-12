@@ -114,6 +114,21 @@ body {
   font-size: 30px;
 }
 
+#main .formbox .toscheck {
+  color: #333;
+  font-size: 18px;
+}
+
+#main .formbox .toscheck a {
+  color: #333;
+  text-decoration: underline;
+}
+
+#main .formbox .toscheck.has-error,
+#main .formbox .toscheck.has-error a {
+  color: #990000;
+}
+
 #main .sharebtns {
   margin: 0px 0px 30px 0px;
 }

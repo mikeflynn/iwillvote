@@ -52,7 +52,8 @@ function verifyForm(formID) {
   var error = false
 
   jQuery('form#'+formID+' :input.rqd').each(function() {
-    if(jQuery(this).val() == "") {
+    var $this = jQuery(this);
+    if(($this.attr('type') == 'checkbox' && !$this.is(':checked')) || jQuery(this).val() == "") {
       jQuery(this).parent().addClass('has-error');
       error = "You are missing one or more required fields.";
     }
