@@ -114,15 +114,17 @@
             </div>
             <div class="row sharebtns">
               <div class="col-md-12">
-                <a class="btn btn-primary btn-lg fb" target="_new" href="http://www.facebook.com/sharer/sharer.php?u={{"http://iwillvote.us/" | urlquery}}&title={{"I Will Vote" | urlquery}}">
-                  <i class="fa fa-facebook-square "></i>
-                  Share on Facebook
-                </a>
+                <div class="fb-like"
+                     data-href="https://iwillvote.us/{{if ne .Active "index"}}{{.Active}}{{else}}{{.Candidate}}{{end}}"
+                     data-layout="button"
+                     data-action="like"
+                     data-show-faces="false"
+                     data-share="true"></div>
 
-                <a class="btn btn-primary btn-lg tw" target="_new" href="http://twitter.com/intent/tweet?status={{"I signed up for my reminder to vote @ https://iwillvote.us!" | urlquery}} ">
-                  <i class="fa fa-twitter"></i>
-                  Share on Twitter
-                </a>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-via="thatmikeflynn">Tweet</a>
+                <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+
+                <a class="reddit" href="//www.reddit.com/submit" onclick="window.location = '//www.reddit.com/submit?url=' + encodeURIComponent(window.location); return false"> <img src="//www.redditstatic.com/spreddit7.gif" alt="submit to reddit" border="0" /> </a>
               </div>
             </div>
           </form>

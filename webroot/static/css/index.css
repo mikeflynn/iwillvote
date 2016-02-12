@@ -26,6 +26,7 @@ a:hover {
   margin: 10px 0px 0px 0px;
   font-size: 36px;
   color: white;
+  text-decoration: none;
 }
 
 #header .buttonbin a {
@@ -139,8 +140,18 @@ a:hover {
   color: #990000;
 }
 
-#main .sharebtns {
+#main .formbox .sharebtns {
   margin: 0px 0px 30px 0px;
+}
+
+#main .formbox .fb-like {
+  position: relative;
+  bottom: 5px;
+}
+
+#main .formbox .reddit {
+  position: relative;
+  bottom: 7px;
 }
 
 #main .hero {
