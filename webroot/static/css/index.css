@@ -5,6 +5,15 @@ body {
   background-size: cover;
 }
 
+a {
+  color: white;
+  text-decoration: underline;
+}
+
+a:hover {
+  color: #8f0018;
+}
+
 #header {
   background-image: url('/static/img/header_bg.png');
   color: white;
@@ -22,6 +31,7 @@ body {
 #header .buttonbin a {
   text-transform: capitalize;
   color: white;
+  text-decoration: none;
 }
 
 #header .buttonbin li a {
