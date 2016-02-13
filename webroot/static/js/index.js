@@ -34,13 +34,13 @@ jQuery(document).ready(function() {
   });
 
   jQuery("form#unsubUser").submit(function(event) {
-    event.preventDefault();
     var error = verifyForm("unsubUser");
 
     if(!error) {
       return true;
     }
 
+    event.preventDefault();
     return false;
   });
 });
