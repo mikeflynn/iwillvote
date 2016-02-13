@@ -188,15 +188,13 @@ func unsubHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				if err = link.Save(); err == nil {
-					msg := &Message{
-						Network:  user.Network,
-						UUID:     user.UUID,
-						Message:  fmt.Sprintf("We have received a request to unsubscribe you from iWillVote.us. Tap on this link to complete the process http://iwillvote.us/code/%s, or do nothing if you don't want to unsubscribe.", link.Hash),
-						Outgoing: 1,
-					}
+					msg := &Message{Slug: "unsub"}
+					if err = msg.Load(); err == nil {
+						msg.AddTo(user.UUID, user.Network)
 
-					if err = msg.Send(); err == nil {
-						message = "If this matches a user in our system we will send a verification link to complete your request."
+						if err = msg.Send(); err == nil {
+							message = "If this matches a user in our system we will send a verification link to complete your request."
+						}
 					}
 				}
 			}
@@ -287,14 +285,10 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 	err = user.Load()
 	if user.ID == 0 {
 		if err = user.Save(); err == nil {
-			message := &Message{
-				Network:  user.Network,
-				UUID:     user.UUID,
-				Message:  "Thanks for signing up! We'll remind you when to vote. Head to iwillvote.us for any questions.",
-				Outgoing: 1,
-			}
+			message := &Message{Slug: "welcome"}
+			if err = message.Load(); err == nil {
+				message.AddTo(user.UUID, user.Network)
 
-			if err = message.Save(); err == nil {
 				if err = message.Send(); err == nil {
 					jsonBytes, _ = json.Marshal(webUserResponse{Data: []*User{user}, Status: "User created and welcome message sent."})
 				}

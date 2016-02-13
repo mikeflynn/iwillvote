@@ -89,8 +89,9 @@ func ProcessS3Emails(bucketName string, limit int64) (int, error) {
 
 		// Save the message
 		msg := &Message{
-			Network:  DomainToNetwork(from[1]),
-			UUID:     from[0],
+			To: []*MessageTo{
+				{UUID: from[0], Network: DomainToNetwork(from[1])},
+			},
 			Message:  string(body),
 			Outgoing: 0,
 		}
