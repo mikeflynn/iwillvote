@@ -203,6 +203,26 @@ a:hover {
 
 @media (max-width: 990px) {
   #header .navbar-brand { margin-left: 10px; }
-  #main .formbox { margin: 0px 10px 0px 10px; }
+  #main .formbox { margin: 0px 10px 0px 10px; z-index: 5; position: relative; }
+  .container { position: relative; }
+  #main .hero {
+    display: block;
+    position: absolute;
+    top: 0px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    min-height: initial;
+    border-radius: 100%;
+    z-index: 2;
+    opacity: 0.7;
+  }
+  #main .greeting {
+    z-index: 5;
+    position: relative;
+  }
+}
+
+@media (max-width: 766px) {
   #header ul.dropdown-menu li a { color: white; }
 }
