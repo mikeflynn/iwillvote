@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/goji/httpauth"
 	"github.com/gorilla/mux"
 )
 
@@ -55,11 +56,16 @@ func main() {
 	r.HandleFunc("/api/user/add/", addUserHandler).Methods("POST")
 	r.HandleFunc("/api/user/remove/", removeUserHandler).Methods("POST")
 
+	// Admin Endpoints
+	ar := mux.NewRouter().PathPrefix("/admin").Subrouter()
+	ar.HandleFunc("/", adminHandler)
+	ar.HandleFunc("/api", adminHandler)
+	r.PathPrefix("/admin").Handler(httpauth.SimpleBasicAuth("user", "pass")(ar))
+
 	// Pages
 	r.HandleFunc("/unsubscribe", unsubHandler).Methods("POST", "GET")
 	r.HandleFunc("/code/{code:[0-9a-f]{5,40}}", codeHandler)
 	r.HandleFunc("/{page:[a-z]*}", pageHandler)
-
 	log.Println("Web server running on " + *Port)
 
 	http.ListenAndServe(":"+*Port, r)
@@ -98,6 +104,10 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+}
+
+func adminHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ADMIN!\n"))
 }
 
 func codeHandler(w http.ResponseWriter, r *http.Request) {
