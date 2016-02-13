@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type Message struct {
@@ -94,11 +95,12 @@ func (this *Message) Save() error {
 	return nil
 }
 
-func (this *Message) AddTo(uuid string, network string) {
+func (this *Message) AddTo(uuid string, network string, params map[string]string) {
 	this.To = append(this.To, &MessageTo{
 		UUID:      uuid,
 		Network:   network,
 		MessageID: this.ID,
+		Params:    params,
 	})
 }
 
@@ -177,12 +179,13 @@ func (this *Message) Send() error {
 }
 
 type MessageTo struct {
-	ID        int64  `json:"id"`
-	MessageID int64  `json:"message_id"`
-	Network   string `json:"network"`
-	UUID      string `json:"uuid"`
-	SendOn    string `json:"send_on"`
-	Sent      int    `json:"sent"`
+	ID        int64             `json:"id"`
+	MessageID int64             `json:"message_id"`
+	Network   string            `json:"network"`
+	UUID      string            `json:"uuid"`
+	Params    map[string]string `json:"params"`
+	SendOn    string            `json:"send_on"`
+	Sent      int               `json:"sent"`
 }
 
 func (this *MessageTo) Save() error {
@@ -193,10 +196,11 @@ func (this *MessageTo) Save() error {
 	// Message Table Record
 	if this.ID == 0 {
 		newID, err := db.Insert(
-			"INSERT INTO user_message SET message_id=?, network=?, uuid=?, send_on=?, sent=?",
+			"INSERT INTO user_message SET message_id=?, network=?, uuid=?, params=?, send_on=?, sent=?",
 			this.MessageID,
 			this.Network,
 			this.UUID,
+			Stringify(this.Params),
 			SQLNullIfEmpty(this.SendOn),
 			this.Sent,
 		)
@@ -206,10 +210,11 @@ func (this *MessageTo) Save() error {
 		}
 	} else {
 		_, err = db.Update(
-			"UPDATE user_message SET message_id=?, network=?, uuid=?, send_on=?, sent=? WHERE id=?",
+			"UPDATE user_message SET message_id=?, network=?, uuid=?, params=?, send_on=?, sent=? WHERE id=?",
 			this.MessageID,
 			this.Network,
 			this.UUID,
+			Stringify(this.Params),
 			SQLNullIfEmpty(this.SendOn),
 			this.Sent,
 			this.ID,
@@ -226,26 +231,43 @@ func (this *MessageTo) Save() error {
 func (this *MessageTo) Load() error {
 	db := NewMySQL()
 
-	params := []interface{}{}
+	whereVars := []interface{}{}
 	where := ""
 
 	if this.ID > 0 {
 		where = "id=?"
-		params = append(params, this.ID)
+		whereVars = append(whereVars, this.ID)
 	} else {
 		return errors.New("Message missing required fields for load: id")
 	}
 
-	result, err := db.Select("SELECT id, message_id, network, uuid, send_on, sent FROM message WHERE "+where+" LIMIT 1", params...)
+	result, err := db.Select("SELECT id, message_id, network, uuid, params, send_on, sent FROM message WHERE "+where+" LIMIT 1", whereVars...)
 	if err != nil {
 		return err
 	}
 
 	for result.Next() {
-		result.Scan(&this.ID, &this.MessageID, &this.Network, &this.UUID, &this.SendOn, &this.Sent)
+		var paramsStr string
+		result.Scan(&this.ID, &this.MessageID, &this.Network, &this.UUID, &paramsStr, &this.SendOn, &this.Sent)
+
+		this.Params = Mapify(paramsStr)
 	}
 
 	return nil
+}
+
+func (this *MessageTo) Body(msg *Message) string {
+	body := msg.Message
+
+	if len(this.Params) == 0 {
+		return body
+	}
+
+	for n, v := range this.Params {
+		body = strings.Replace(body, "[["+strings.ToUpper(n)+"]]", v, -1)
+	}
+
+	return body
 }
 
 func (this *MessageTo) Send(msg *Message) error {
@@ -267,7 +289,7 @@ func (this *MessageTo) Email(msg *Message) error {
 		From:    "sms@iwillvote.us",
 		To:      fmt.Sprintf(NetworkToDomain(this.Network), this.UUID),
 		Subject: "",
-		Body:    msg.Message,
+		Body:    this.Body(msg),
 	}
 
 	if err := email.Send(); err != nil {

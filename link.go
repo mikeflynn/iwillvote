@@ -8,7 +8,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/google/google-api-go-client/googleapi/transport"
@@ -38,7 +37,7 @@ func (this *Link) Save() error {
 			this.Hash,
 			this.UserID,
 			this.Action,
-			stringify(this.Payload),
+			Stringify(this.Payload),
 			this.ExpiresIn,
 		)
 	} else {
@@ -46,7 +45,7 @@ func (this *Link) Save() error {
 			"UPDATE link SET user_id=?, action=?, payload=?, expires_in=? WHERE hash=?",
 			this.UserID,
 			this.Action,
-			stringify(this.Payload),
+			Stringify(this.Payload),
 			this.ExpiresIn,
 			this.Hash,
 		)
@@ -81,7 +80,7 @@ func (this *Link) Load() error {
 			return err
 		}
 
-		this.Payload = mapify(payloadStr)
+		this.Payload = Mapify(payloadStr)
 
 		if expires.Valid {
 			this.ExpiresIn = expires.Int64
@@ -158,32 +157,4 @@ func (this *Link) Shorten() (string, error) {
 func makeHash() string {
 	data := []byte(time.Now().String())
 	return fmt.Sprintf("%x", sha1.Sum(data))
-}
-
-func mapify(in string) map[string]string {
-	if in == "" {
-		return map[string]string{}
-	}
-
-	a := strings.Split(in, "&")
-	m := make(map[string]string, len(a))
-	for _, v := range a {
-		x := strings.Split(v, "=")
-		m[x[0]] = x[1]
-	}
-
-	return m
-}
-
-func stringify(in map[string]string) string {
-	if len(in) == 0 {
-		return ""
-	}
-
-	out := []string{}
-	for k, v := range in {
-		out = append(out, fmt.Sprintf("%s=%s", k, v))
-	}
-
-	return strings.Join(out, "&")
 }

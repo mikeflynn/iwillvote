@@ -54,7 +54,7 @@ func main() {
 
 	// API Endpoints
 	r.HandleFunc("/api/user/add/", addUserHandler).Methods("POST")
-	r.HandleFunc("/api/user/remove/", removeUserHandler).Methods("POST")
+	//r.HandleFunc("/api/user/remove/", removeUserHandler).Methods("POST")
 
 	// Admin Endpoints
 	ar := mux.NewRouter().PathPrefix("/admin").Subrouter()
@@ -190,7 +190,7 @@ func unsubHandler(w http.ResponseWriter, r *http.Request) {
 				if err = link.Save(); err == nil {
 					msg := &Message{Slug: "unsub"}
 					if err = msg.Load(); err == nil {
-						msg.AddTo(user.UUID, user.Network)
+						msg.AddTo(user.UUID, user.Network, map[string]string{"hash": link.Hash})
 
 						if err = msg.Send(); err == nil {
 							message = "If this matches a user in our system we will send a verification link to complete your request."
@@ -287,7 +287,7 @@ func addUserHandler(w http.ResponseWriter, r *http.Request) {
 		if err = user.Save(); err == nil {
 			message := &Message{Slug: "welcome"}
 			if err = message.Load(); err == nil {
-				message.AddTo(user.UUID, user.Network)
+				message.AddTo(user.UUID, user.Network, nil)
 
 				if err = message.Send(); err == nil {
 					jsonBytes, _ = json.Marshal(webUserResponse{Data: []*User{user}, Status: "User created and welcome message sent."})
