@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 type Message struct {
@@ -20,7 +21,7 @@ type Message struct {
 func GetMessagesToSend() ([]*Message, error) {
 	db := NewMySQL()
 
-	result, err := db.Select(`SELECT m.id, network, uuid, slug, message, outgoing, m.created_on, send_on, sent
+	result, err := db.Select(`SELECT m.id AS message_id, slug, message, outgoing, m.created_on, um.id AS messageto_id, network, uuid, params, send_on, sent
 		FROM user_message AS um
 		LEFT JOIN message AS m ON (m.id = um.message_id)
 		WHERE sent = 0 AND send_on < now()`)
@@ -33,8 +34,11 @@ func GetMessagesToSend() ([]*Message, error) {
 	for result.Next() {
 		msg := &Message{}
 		msgTo := &MessageTo{}
+		paramStr := ""
 
-		result.Scan(&msg.ID, &msgTo.Network, &msgTo.UUID, &msg.Slug, &msg.Message, &msg.Outgoing, &msg.CreatedOn, &msg.SendOn, &msg.Sent)
+		result.Scan(&msg.ID, &msg.Slug, &msg.Message, &msg.Outgoing, &msg.CreatedOn, &msgTo.ID, &msgTo.Network, &msgTo.UUID, &paramStr, &msgTo.SendOn, &msgTo.Sent)
+
+		msgTo.Params = Mapify(paramStr)
 		msg.To = []*MessageTo{msgTo}
 		rows = append(rows, msg)
 	}
@@ -272,6 +276,18 @@ func (this *MessageTo) Body(msg *Message) string {
 
 func (this *MessageTo) Send(msg *Message) error {
 	var err error
+
+	if this.SendOn != "" {
+		loc, _ := time.LoadLocation("Local")
+		sendOn, _ := time.ParseInLocation("2006-01-02 15:04:05", this.SendOn, loc)
+		if time.Now().Local().Unix() < sendOn.Unix() {
+			if this.ID == 0 {
+				err = this.Save()
+			}
+
+			return err
+		}
+	}
 
 	if err = this.Email(msg); err == nil {
 		this.Sent = 1
