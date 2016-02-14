@@ -7,15 +7,32 @@ import (
 	"time"
 )
 
-type Message struct {
-	ID        int64        `json:"id"`
-	To        []*MessageTo `json:"to"`
-	Slug      string       `json:"slug"`
-	Message   string       `json:"message"`
-	Outgoing  int          `json:"outgoing"`
-	CreatedOn string       `json:"created_on"`
-	SendOn    string       `json:"send_on"`
-	Sent      int          `json:"sent"`
+func GetUserThread() ([]*Message, error) {
+	db := NewMySQL()
+
+	result, err := db.Select(`SELECT m.id AS message_id, slug, message, outgoing, m.created_on, um.id AS messageto_id, network, uuid, params, send_on, sent
+		FROM user_message AS um
+		LEFT JOIN message AS m ON (m.id = um.message_id)
+		WHERE um.uuid=? AND um.network=?`)
+	if err != nil {
+		return []*Message{}, err
+	}
+
+	rows := []*Message{}
+
+	for result.Next() {
+		msg := &Message{}
+		msgTo := &MessageTo{}
+		paramStr := ""
+
+		result.Scan(&msg.ID, &msg.Slug, &msg.Message, &msg.Outgoing, &msg.CreatedOn, &msgTo.ID, &msgTo.Network, &msgTo.UUID, &paramStr, &msgTo.SendOn, &msgTo.Sent)
+
+		msgTo.Params = Mapify(paramStr)
+		msg.To = []*MessageTo{msgTo}
+		rows = append(rows, msg)
+	}
+
+	return rows, nil
 }
 
 func GetMessagesToSend() ([]*Message, error) {
@@ -44,6 +61,17 @@ func GetMessagesToSend() ([]*Message, error) {
 	}
 
 	return rows, nil
+}
+
+type Message struct {
+	ID        int64        `json:"id"`
+	To        []*MessageTo `json:"to"`
+	Slug      string       `json:"slug"`
+	Message   string       `json:"message"`
+	Outgoing  int          `json:"outgoing"`
+	CreatedOn string       `json:"created_on"`
+	SendOn    string       `json:"send_on"`
+	Sent      int          `json:"sent"`
 }
 
 func (this *Message) Save() error {

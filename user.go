@@ -6,6 +6,89 @@ import (
 	"regexp"
 )
 
+func GetUserCount() (int64, error) {
+	db := NewMySQL()
+
+	var count int64
+
+	result, err := db.Select("SELECT count(*) FROM user")
+	if err != nil {
+		return count, err
+	}
+
+	for result.Next() {
+		err := result.Scan(&count)
+		if err != nil {
+			return count, err
+		}
+	}
+
+	return count, nil
+}
+
+func GetUsersCountByCandidate() (map[string]int64, error) {
+	db := NewMySQL()
+
+	var count map[string]int64
+
+	result, err := db.Select("SELECT IF(landing_page = '', 'front', landing_page) AS landing_page, count(*) AS total FROM user GROUP BY landing_page")
+	if err != nil {
+		return count, err
+	}
+
+	for result.Next() {
+		var p string
+		var c int64
+		err := result.Scan(&p, &c)
+		if err != nil {
+			return count, err
+		}
+
+		count[p] = c
+	}
+
+	return count, nil
+}
+
+func ListUsers(landing string, state string, sort string, limit int) ([]*User, error) {
+	db := NewMySQL()
+
+	var userList []*User
+
+	where := ""
+	whereVars := []string{}
+
+	if landing != "" {
+		where += "landing_page = ?"
+		whereVars = append(whereVars, landing)
+	}
+
+	if state != "" {
+		where += "state = ?"
+		whereVars = append(whereVars, state)
+	}
+
+	result, err := db.Select(`SELECT
+		id, network, uuid, name, state, zipcode, created_on, deleted, landing_page, message_window, news, reminders
+		FROM user WHERE ? ORDER BY ? DESC LIMIT ?`,
+		where, sort, limit)
+	if err != nil {
+		return userList, err
+	}
+
+	for result.Next() {
+		u := &User{}
+		err := result.Scan(&u.ID, &u.Network, &u.UUID, &u.Name, &u.State, &u.Zipcode, &u.CreatedOn, &u.Deleted, &u.LandingPage, &u.MessageWindow, &u.News, &u.Reminders)
+		if err != nil {
+			return userList, err
+		}
+
+		userList = append(userList, u)
+	}
+
+	return userList, nil
+}
+
 type User struct {
 	ID            int64  `json:"id"`
 	Network       string `json:"network"`
@@ -20,10 +103,6 @@ type User struct {
 	News          int    `json:"news_feed"`
 	Reminders     int    `json:"reminders"`
 }
-
-//func FilterUsers() ([]*User, error) {
-//
-//}
 
 func (this *User) IsComplete() error {
 	if this.Network != "" && this.UUID != "" {

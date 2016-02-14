@@ -58,8 +58,7 @@ func main() {
 
 	// Admin Endpoints
 	ar := mux.NewRouter().PathPrefix("/admin").Subrouter()
-	ar.HandleFunc("/", adminHandler)
-	ar.HandleFunc("/api", adminHandler)
+	ar.HandleFunc("/{page:[a-z]*}", AdminPageHandler)
 	r.PathPrefix("/admin").Handler(httpauth.SimpleBasicAuth("user", "pass")(ar))
 
 	// Pages
@@ -104,10 +103,6 @@ func pageHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-}
-
-func adminHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("ADMIN!\n"))
 }
 
 func codeHandler(w http.ResponseWriter, r *http.Request) {
