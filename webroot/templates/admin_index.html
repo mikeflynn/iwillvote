@@ -1,6 +1,47 @@
 {{define "admin_index"}}
 {{template "admin_header" .}}
   <div class="container">
-  ADMIN INDEX
+    <div class="row">
+      <div class="col-md-6">
+        <div class="stat">
+          <h2>Total Users</h2>
+          {{.TotalUsers}}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="stat">
+          <h2>New Users</h2>
+          {{.DailyUsers}}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="stat">
+          <h2>Users by Landing Page</h2>
+          <table class="table table-striped">
+          {{range $page, $count := .LandingUsers}}
+          <tr>
+            <td class="pre"><a href="https://iwillvote.us/{{$page}}" target="new">/{{$page}}</a></td>
+            <td>{{$count}}</td>
+          </tr>
+          {{end}}
+          </table>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="stat">
+          <h2>Users by State</h2>
+          <table class="table table-striped">
+          {{range $state, $count := .StateUsers}}
+          <tr>
+            <td>{{$state}}</td>
+            <td>{{$count}}</td>
+          </tr>
+          {{end}}
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
 {{end}}

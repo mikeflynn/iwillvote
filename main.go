@@ -58,7 +58,9 @@ func main() {
 
 	// Admin Endpoints
 	ar := mux.NewRouter().PathPrefix("/admin").Subrouter()
-	ar.HandleFunc("/{page:[a-z]*}", AdminPageHandler)
+	ar.HandleFunc("/", AdminIndexHandler)
+	ar.HandleFunc("/messages", AdminMessagesHandler)
+	ar.HandleFunc("/users", AdminUsersHandler)
 	r.PathPrefix("/admin").Handler(httpauth.SimpleBasicAuth("user", "pass")(ar))
 
 	// Pages

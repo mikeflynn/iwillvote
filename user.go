@@ -4,14 +4,32 @@ import (
 	"errors"
 	"log"
 	"regexp"
+	"time"
 )
 
-func GetUserCount() (int64, error) {
+func GetUserCount(since string) (int64, error) {
 	db := NewMySQL()
+
+	var query string
+	var queryVars []interface{}
+
+	if since != "" {
+		var d time.Duration
+		var err error
+		if d, err = time.ParseDuration(since); err != nil {
+			return 0, err
+		}
+
+		datetime := time.Now().Add(d).Format("2006-01-02 15:04:05")
+		query = "SELECT count(*) AS total FROM user WHERE created_on > ?"
+		queryVars = append(queryVars, datetime)
+	} else {
+		query = "SELECT count(*) AS total FROM user"
+	}
 
 	var count int64
 
-	result, err := db.Select("SELECT count(*) FROM user")
+	result, err := db.Select(query, queryVars...)
 	if err != nil {
 		return count, err
 	}
@@ -26,12 +44,36 @@ func GetUserCount() (int64, error) {
 	return count, nil
 }
 
-func GetUsersCountByCandidate() (map[string]int64, error) {
+func GetUsersCountByLanding() (map[string]int64, error) {
 	db := NewMySQL()
 
-	var count map[string]int64
+	count := map[string]int64{}
 
-	result, err := db.Select("SELECT IF(landing_page = '', 'front', landing_page) AS landing_page, count(*) AS total FROM user GROUP BY landing_page")
+	result, err := db.Select("SELECT IF(landing_page = '', 'index', landing_page) AS landing_page, count(*) AS total FROM user GROUP BY landing_page")
+	if err != nil {
+		return count, err
+	}
+
+	for result.Next() {
+		var p string
+		var c int64
+		err := result.Scan(&p, &c)
+		if err != nil {
+			return count, err
+		}
+
+		count[p] = c
+	}
+
+	return count, nil
+}
+
+func GetUsersCountByState() (map[string]int64, error) {
+	db := NewMySQL()
+
+	count := map[string]int64{}
+
+	result, err := db.Select("SELECT IF(state = '', 'NONE', state) AS state, count(*) AS total FROM user GROUP BY state")
 	if err != nil {
 		return count, err
 	}
