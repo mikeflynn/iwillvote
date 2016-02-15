@@ -7,6 +7,30 @@ import (
 	"time"
 )
 
+func GetMessageList() ([]*Message, error) {
+	db := NewMySQL()
+
+	result, err := db.Select(`SELECT id, slug, message, m.created_on
+		FROM message AS m
+		WHERE m.outgoing=1
+		ORDER BY created_on DESC`)
+	if err != nil {
+		return []*Message{}, err
+	}
+
+	rows := []*Message{}
+
+	for result.Next() {
+		msg := &Message{}
+
+		result.Scan(&msg.ID, &msg.Slug, &msg.Message, &msg.CreatedOn)
+
+		rows = append(rows, msg)
+	}
+
+	return rows, nil
+}
+
 func GetUserThread() ([]*Message, error) {
 	db := NewMySQL()
 
