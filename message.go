@@ -31,13 +31,13 @@ func GetMessageList() ([]*Message, error) {
 	return rows, nil
 }
 
-func GetUserThread() ([]*Message, error) {
+func GetUserThread(uuid string, network string) ([]*Message, error) {
 	db := NewMySQL()
 
 	result, err := db.Select(`SELECT m.id AS message_id, slug, message, outgoing, m.created_on, um.id AS messageto_id, network, uuid, params, send_on, sent
 		FROM user_message AS um
 		LEFT JOIN message AS m ON (m.id = um.message_id)
-		WHERE um.uuid=? AND um.network=?`)
+		WHERE um.uuid=? AND um.network=?`, uuid, network)
 	if err != nil {
 		return []*Message{}, err
 	}

@@ -91,10 +91,45 @@ func AdminMessagesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AdminUserDetailHandler(w http.ResponseWriter, r *http.Request) {
-	//var username string
+	var username string
+	var ok bool
 
 	vars := mux.Vars(r)
-	if _, ok := vars["user"]; !ok {
+	if username, ok = vars["user"]; !ok {
+		http.NotFound(w, r)
+		return
+	}
+
+	userParts := strings.Split(username, "@")
+	user := &User{
+		UUID:    userParts[0],
+		Network: userParts[1],
+	}
+
+	user.Load()
+
+	thread, err := GetUserThread(user.UUID, user.Network)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal server error.", 500)
+		return
+	}
+
+	data := struct {
+		Active   string
+		Username string
+		Thread   []*Message
+		User     *User
+	}{
+		Active:   "users",
+		Username: username,
+		User:     user,
+		Thread:   thread,
+	}
+
+	err := Templates.ExecuteTemplate(w, "admin_users", data)
+	if err != nil {
+		log.Println(err.Error())
 		http.NotFound(w, r)
 		return
 	}
