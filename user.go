@@ -92,7 +92,7 @@ func GetUsersCountByState() (map[string]int64, error) {
 	return count, nil
 }
 
-func ListUsers(landing string, state string, sort string, limit int) ([]*User, error) {
+func ListUsers(landing string, state string, sort string, limit int64, offset int64) ([]*User, error) {
 	db := NewMySQL()
 
 	var userList []*User
@@ -110,10 +110,19 @@ func ListUsers(landing string, state string, sort string, limit int) ([]*User, e
 		whereVars = append(whereVars, state)
 	}
 
+	validSort := map[string]bool{"created_on": true, "name": true, "uuid": true}
+	if _, ok := validSort[sort]; !ok {
+		sort = "created_on"
+	}
+
+	if where == "" {
+		where = "1=1"
+	}
+
 	result, err := db.Select(`SELECT
 		id, network, uuid, name, state, zipcode, created_on, deleted, landing_page, message_window, news, reminders
-		FROM user WHERE ? ORDER BY ? DESC LIMIT ?`,
-		where, sort, limit)
+		FROM user WHERE ? ORDER BY `+sort+` DESC LIMIT ?, ?`,
+		where, offset, limit)
 	if err != nil {
 		return userList, err
 	}

@@ -1,4 +1,67 @@
 {{define "admin_users"}}
 {{template "admin_header" .}}
-USERS
+<div class="container">
+  {{if ne .Error ""}}
+  <div class="alert alert-danger">{{.Error}}</div>
+  {{end}}
+
+  {{if ne .Success ""}}
+  <div class="alert alert-success">{{.Success}}</div>
+  {{end}}
+
+  <div class="row">
+    <div class="col-md-12">
+      <table class="table table-striped">
+        <tr>
+          <th><input type="checkbox" value="all_filtered" name="users"></th>
+          <th>Address</th>
+          <th>Name</th>
+          <th>State</th>
+          <th>Join On</th>
+        </tr>
+        {{range $key, $row := .UserList}}
+        <tr>
+          <td><input type="checkbox" value="{{$row.UUID}}@{{$row.Network}}" name="user_{{$key}}"></td>
+          <td><a href="/admin/users/{{$row.UUID}}@{{$row.Network}}">{{$row.UUID}}@{{$row.Network}}</a></td>
+          <td>{{$row.Name}}</td>
+          <td>{{$row.State}}</td>
+          <td>{{$row.CreatedOn}}</td>
+        </tr>
+        {{end}}
+      </table>
+
+      <nav>
+        <ul class="pager">
+          <li class="previous {{if eq .Prev "#"}}disabled{{end}}"><a href="{{.Prev}}"><span aria-hidden="true">&larr;</span> Older</a></li>
+          <li class="next"><a href="{{.Next}}">Newer <span aria-hidden="true">&rarr;</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+      <form action="" method="post">
+        <h2>Send Message Blast</h2>
+        <div class="form-group">
+          <label for="messageSlugInput">Message</label>
+          <select class="form-control" id="messageInput">
+            <options value="">Select a Message</options>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="toInput">Users</label>
+          <input type="text" id="toInput" class="form-control" placeholder="UUID@network">
+        </div>
+        <div class="form-group">
+          <label for="sendOnInput">Send On</label>
+          <input type="text" id="sendOnInput" class="form-control" placeholder="2016/06/22 or leave this blank to send now">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
 {{end}}

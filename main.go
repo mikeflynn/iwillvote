@@ -61,6 +61,7 @@ func main() {
 	ar.HandleFunc("/", AdminIndexHandler)
 	ar.HandleFunc("/messages", AdminMessagesHandler).Methods("POST", "GET")
 	ar.HandleFunc("/users", AdminUsersHandler)
+	ar.HandleFunc("/users/{user:[\\w]+@[\\w]+}", AdminUserDetailHandler)
 	r.PathPrefix("/admin").Handler(httpauth.SimpleBasicAuth("user", "pass")(ar))
 
 	// Pages
