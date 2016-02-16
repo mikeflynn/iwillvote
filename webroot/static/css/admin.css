@@ -31,3 +31,36 @@ td div.message {
   padding-top: 10px;
   margin-top: 10px;
 }
+
+.info {
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.info span {
+  font-weight: bold;
+}
+
+.thread .msg {
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  margin: 10px 0px 10px 0px;
+  font-family: monospace;
+  position: relative;
+}
+
+.thread .msg .timestamp {
+  margin-top: 5px;
+  border-top: 1px solid #eee;
+  padding-top: 5px;
+}
+
+.thread .msg.outgoing {
+  margin-left: 50px;
+}
+
+.thread .msg.incoming {
+  margin-right: 50px;
+}

@@ -62,7 +62,7 @@ func GetUserThread(uuid string, network string) ([]*Message, error) {
 func GetMessagesToSend() ([]*Message, error) {
 	db := NewMySQL()
 
-	result, err := db.Select(`SELECT m.id AS message_id, slug, message, outgoing, m.created_on, um.id AS messageto_id, network, uuid, params, send_on, sent
+	result, err := db.Select(`SELECT m.id AS message_id, slug, message, outgoing, m.created_on, um.id AS messageto_id, network, uuid, params, send_on, sent, um.created_on
 		FROM user_message AS um
 		LEFT JOIN message AS m ON (m.id = um.message_id)
 		WHERE sent = 0 AND send_on < now()`)
@@ -77,7 +77,7 @@ func GetMessagesToSend() ([]*Message, error) {
 		msgTo := &MessageTo{}
 		paramStr := ""
 
-		result.Scan(&msg.ID, &msg.Slug, &msg.Message, &msg.Outgoing, &msg.CreatedOn, &msgTo.ID, &msgTo.Network, &msgTo.UUID, &paramStr, &msgTo.SendOn, &msgTo.Sent)
+		result.Scan(&msg.ID, &msg.Slug, &msg.Message, &msg.Outgoing, &msg.CreatedOn, &msgTo.ID, &msgTo.Network, &msgTo.UUID, &paramStr, &msgTo.SendOn, &msgTo.Sent, &msgTo.CreatedOn)
 
 		msgTo.Params = Mapify(paramStr)
 		msg.To = []*MessageTo{msgTo}
@@ -242,6 +242,7 @@ type MessageTo struct {
 	Params    map[string]string `json:"params"`
 	SendOn    string            `json:"send_on"`
 	Sent      int               `json:"sent"`
+	CreatedOn string            `json:"created_on"`
 }
 
 func (this *MessageTo) Save() error {
@@ -297,14 +298,14 @@ func (this *MessageTo) Load() error {
 		return errors.New("Message missing required fields for load: id")
 	}
 
-	result, err := db.Select("SELECT id, message_id, network, uuid, params, send_on, sent FROM message WHERE "+where+" LIMIT 1", whereVars...)
+	result, err := db.Select("SELECT id, message_id, network, uuid, params, send_on, sent, created_on FROM message WHERE "+where+" LIMIT 1", whereVars...)
 	if err != nil {
 		return err
 	}
 
 	for result.Next() {
 		var paramsStr string
-		result.Scan(&this.ID, &this.MessageID, &this.Network, &this.UUID, &paramsStr, &this.SendOn, &this.Sent)
+		result.Scan(&this.ID, &this.MessageID, &this.Network, &this.UUID, &paramsStr, &this.SendOn, &this.Sent, &this.CreatedOn)
 
 		this.Params = Mapify(paramsStr)
 	}

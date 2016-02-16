@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -108,6 +109,26 @@ func AdminUserDetailHandler(w http.ResponseWriter, r *http.Request) {
 
 	user.Load()
 
+	var errorMsg, successMsg string
+
+	err := r.ParseForm()
+	if err == nil && r.FormValue("messageInput") != "" {
+		msg := &Message{
+			Slug:     "custom_" + username + "_" + strconv.FormatInt(time.Now().Unix(), 10),
+			Message:  r.FormValue("messageInput"),
+			Outgoing: 1,
+		}
+
+		msg.AddTo(user.UUID, user.Network, nil)
+
+		if err := msg.Send(); err != nil {
+			log.Println(err.Error())
+			errorMsg = "Unable to send message."
+		} else {
+			successMsg = "Message sent!"
+		}
+	}
+
 	thread, err := GetUserThread(user.UUID, user.Network)
 	if err != nil {
 		log.Println(err.Error())
@@ -117,6 +138,8 @@ func AdminUserDetailHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := struct {
 		Active   string
+		Success  string
+		Error    string
 		Username string
 		Thread   []*Message
 		User     *User
@@ -125,9 +148,11 @@ func AdminUserDetailHandler(w http.ResponseWriter, r *http.Request) {
 		Username: username,
 		User:     user,
 		Thread:   thread,
+		Success:  successMsg,
+		Error:    errorMsg,
 	}
 
-	err := Templates.ExecuteTemplate(w, "admin_users", data)
+	err = Templates.ExecuteTemplate(w, "admin_users_detail", data)
 	if err != nil {
 		log.Println(err.Error())
 		http.NotFound(w, r)
