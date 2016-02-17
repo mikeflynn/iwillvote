@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/goji/httpauth"
@@ -62,7 +63,7 @@ func main() {
 	ar.HandleFunc("/messages", AdminMessagesHandler).Methods("POST", "GET")
 	ar.HandleFunc("/users", AdminUsersHandler)
 	ar.HandleFunc("/users/{user:[\\w]+@[\\w]+}", AdminUserDetailHandler)
-	r.PathPrefix("/admin").Handler(httpauth.SimpleBasicAuth("user", "pass")(ar))
+	r.PathPrefix("/admin").Handler(httpauth.SimpleBasicAuth(os.Getenv("ADMIN_USER"), os.Getenv("ADMIN_PASS"))(ar))
 
 	// Pages
 	r.HandleFunc("/unsubscribe", unsubHandler).Methods("POST", "GET")
