@@ -200,6 +200,11 @@ func AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	landingPages, err := GetLandingPages()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 	data := struct {
 		Active      string
 		MessageList []*Message
@@ -208,11 +213,24 @@ func AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		Error       string
 		Prev        string
 		Next        string
+		Params      struct {
+			State   string
+			Landing string
+		}
+		LandingPages []string
 	}{
 		Active:   "users",
 		UserList: userList,
 		Prev:     prevLink,
 		Next:     nextLink,
+		Params: struct {
+			State   string
+			Landing string
+		}{
+			State:   state,
+			Landing: landing,
+		},
+		LandingPages: landingPages,
 	}
 
 	err = Templates.ExecuteTemplate(w, "admin_users", data)

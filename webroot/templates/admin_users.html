@@ -11,6 +11,74 @@
 
   <div class="row">
     <div class="col-md-12">
+      <form class="filters form-inline" method="get">
+        <div class="form-group">
+          <select class="form-control" name="state">
+            <option value="">Filter by State</option>
+            <option value="AL" {{if eq "AL" .Params.State}}selected{{end}}>Alabama</option>
+            <option value="AK" {{if eq "AK" .Params.State}}selected{{end}}>Alaska</option>
+            <option value="AZ" {{if eq "AZ" .Params.State}}selected{{end}}>Arizona</option>
+            <option value="AR" {{if eq "AR" .Params.State}}selected{{end}}>Arkansas</option>
+            <option value="CA" {{if eq "CA" .Params.State}}selected{{end}}>California</option>
+            <option value="CO" {{if eq "CO" .Params.State}}selected{{end}}>Colorado</option>
+            <option value="CT" {{if eq "CT" .Params.State}}selected{{end}}>Connecticut</option>
+            <option value="DE" {{if eq "DE" .Params.State}}selected{{end}}>Delaware</option>
+            <option value="DC" {{if eq "DC" .Params.State}}selected{{end}}>District Of Columbia</option>
+            <option value="FL" {{if eq "FL" .Params.State}}selected{{end}}>Florida</option>
+            <option value="GA" {{if eq "GA" .Params.State}}selected{{end}}>Georgia</option>
+            <option value="HI" {{if eq "HI" .Params.State}}selected{{end}}>Hawaii</option>
+            <option value="ID" {{if eq "ID" .Params.State}}selected{{end}}>Idaho</option>
+            <option value="IL" {{if eq "IL" .Params.State}}selected{{end}}>Illinois</option>
+            <option value="IN" {{if eq "IN" .Params.State}}selected{{end}}>Indiana</option>
+            <option value="IA" {{if eq "IA" .Params.State}}selected{{end}}>Iowa</option>
+            <option value="KS" {{if eq "KS" .Params.State}}selected{{end}}>Kansas</option>
+            <option value="KY" {{if eq "KY" .Params.State}}selected{{end}}>Kentucky</option>
+            <option value="LA" {{if eq "LA" .Params.State}}selected{{end}}>Louisiana</option>
+            <option value="ME" {{if eq "ME" .Params.State}}selected{{end}}>Maine</option>
+            <option value="MD" {{if eq "MD" .Params.State}}selected{{end}}>Maryland</option>
+            <option value="MA" {{if eq "MA" .Params.State}}selected{{end}}>Massachusetts</option>
+            <option value="MI" {{if eq "MI" .Params.State}}selected{{end}}>Michigan</option>
+            <option value="MN" {{if eq "MN" .Params.State}}selected{{end}}>Minnesota</option>
+            <option value="MS" {{if eq "MS" .Params.State}}selected{{end}}>Mississippi</option>
+            <option value="MO" {{if eq "MO" .Params.State}}selected{{end}}>Missouri</option>
+            <option value="MT" {{if eq "MT" .Params.State}}selected{{end}}>Montana</option>
+            <option value="NE" {{if eq "NE" .Params.State}}selected{{end}}>Nebraska</option>
+            <option value="NV" {{if eq "NV" .Params.State}}selected{{end}}>Nevada</option>
+            <option value="NH" {{if eq "NH" .Params.State}}selected{{end}}>New Hampshire</option>
+            <option value="NJ" {{if eq "NJ" .Params.State}}selected{{end}}>New Jersey</option>
+            <option value="NM" {{if eq "NM" .Params.State}}selected{{end}}>New Mexico</option>
+            <option value="NY" {{if eq "NY" .Params.State}}selected{{end}}>New York</option>
+            <option value="NC" {{if eq "NC" .Params.State}}selected{{end}}>North Carolina</option>
+            <option value="ND" {{if eq "ND" .Params.State}}selected{{end}}>North Dakota</option>
+            <option value="OH" {{if eq "OH" .Params.State}}selected{{end}}>Ohio</option>
+            <option value="OK" {{if eq "OK" .Params.State}}selected{{end}}>Oklahoma</option>
+            <option value="OR" {{if eq "OR" .Params.State}}selected{{end}}>Oregon</option>
+            <option value="PA" {{if eq "PA" .Params.State}}selected{{end}}>Pennsylvania</option>
+            <option value="RI" {{if eq "RI" .Params.State}}selected{{end}}>Rhode Island</option>
+            <option value="SC" {{if eq "SC" .Params.State}}selected{{end}}>South Carolina</option>
+            <option value="SD" {{if eq "SD" .Params.State}}selected{{end}}>South Dakota</option>
+            <option value="TN" {{if eq "TN" .Params.State}}selected{{end}}>Tennessee</option>
+            <option value="TX" {{if eq "TX" .Params.State}}selected{{end}}>Texas</option>
+            <option value="UT" {{if eq "UT" .Params.State}}selected{{end}}>Utah</option>
+            <option value="VT" {{if eq "VT" .Params.State}}selected{{end}}>Vermont</option>
+            <option value="VA" {{if eq "VA" .Params.State}}selected{{end}}>Virginia</option>
+            <option value="WA" {{if eq "WA" .Params.State}}selected{{end}}>Washington</option>
+            <option value="WV" {{if eq "WV" .Params.State}}selected{{end}}>West Virginia</option>
+            <option value="WI" {{if eq "WI" .Params.State}}selected{{end}}>Wisconsin</option>
+            <option value="WY" {{if eq "WY" .Params.State}}selected{{end}}>Wyoming</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <select class="form-control" name="landing">
+            <option value="">Filter by Landing Page</option>
+            {{range $k, $l := .LandingPages}}
+            <option value="{{$l}}" {{if eq $l $.Params.Landing}}selected{{end}}>{{$l}}</option>
+            {{end}}
+          </select>
+        </div>
+
+        <input type="submit" value="Filter" class="btn btn-default">
+      </form>
       <table class="table table-striped">
         <tr>
           <th><input type="checkbox" value="all_filtered" name="users"></th>

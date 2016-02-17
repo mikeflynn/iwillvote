@@ -4,8 +4,35 @@ import (
 	"errors"
 	"log"
 	"regexp"
+	"strings"
 	"time"
 )
+
+func GetLandingPages() ([]string, error) {
+	db := NewMySQL()
+
+	var err error
+	pages := []string{}
+
+	result, err := db.Select("SELECT DISTINCT landing_page FROM user")
+	if err != nil {
+		return []string{}, err
+	}
+
+	for result.Next() {
+		var page string
+		err = result.Scan(&page)
+		if err != nil {
+			return pages, err
+		}
+
+		if page != "" {
+			pages = append(pages, page)
+		}
+	}
+
+	return pages, err
+}
 
 func GetUserCount(since string) (int64, error) {
 	db := NewMySQL()
@@ -97,16 +124,16 @@ func ListUsers(landing string, state string, sort string, limit int64, offset in
 
 	var userList []*User
 
-	where := ""
-	whereVars := []string{}
+	where := []string{}
+	whereVars := []interface{}{}
 
 	if landing != "" {
-		where += "landing_page = ?"
+		where = append(where, "landing_page = ?")
 		whereVars = append(whereVars, landing)
 	}
 
 	if state != "" {
-		where += "state = ?"
+		where = append(where, "state = ?")
 		whereVars = append(whereVars, state)
 	}
 
@@ -115,14 +142,19 @@ func ListUsers(landing string, state string, sort string, limit int64, offset in
 		sort = "created_on"
 	}
 
-	if where == "" {
-		where = "1=1"
+	whereStr := ""
+	if len(where) == 0 {
+		whereStr = "1=1"
+	} else {
+		whereStr = strings.Join(where, " AND ")
 	}
+
+	whereVars = append(whereVars, offset, limit)
 
 	result, err := db.Select(`SELECT
 		id, network, uuid, name, state, zipcode, created_on, deleted, landing_page, message_window, news, reminders
-		FROM user WHERE ? ORDER BY `+sort+` DESC LIMIT ?, ?`,
-		where, offset, limit)
+		FROM user WHERE `+whereStr+` ORDER BY `+sort+` DESC LIMIT ?, ?`,
+		whereVars...)
 	if err != nil {
 		return userList, err
 	}
