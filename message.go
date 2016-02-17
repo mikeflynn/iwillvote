@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -396,4 +397,8 @@ func DomainToNetwork(domain string) string {
 	}
 
 	return ""
+}
+
+func MakeSlug(prefix string) string {
+	return prefix + "_" + strconv.FormatInt(time.Now().Unix(), 10)
 }

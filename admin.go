@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -114,7 +113,7 @@ func AdminUserDetailHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err == nil && r.FormValue("messageInput") != "" {
 		msg := &Message{
-			Slug:     "custom_" + username + "_" + strconv.FormatInt(time.Now().Unix(), 10),
+			Slug:     MakeSlug("custom_" + username),
 			Message:  r.FormValue("messageInput"),
 			Outgoing: 1,
 		}

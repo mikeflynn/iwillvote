@@ -12,7 +12,7 @@
     <div class="col-md-8 thread">
       {{range $key, $row := .Thread}}
       <div class="msg {{if eq $row.Outgoing 1}}outgoing{{else}}incoming{{end}}">
-        <div class="body">{{$row.Message}}</div>
+        <div class="body">{{with index $row.To 0}}{{.Body $row}}{{end}}</div>
         <div class="timestamp">{{$row.CreatedOn}}</div>
       </div>
       {{end}}
