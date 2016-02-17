@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -162,6 +163,71 @@ func AdminUserDetailHandler(w http.ResponseWriter, r *http.Request) {
 func AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 	params := r.URL.Query()
 
+	var errorMsg, successMsg string
+
+	formData := struct {
+		MessageID int64
+		ToUsers   string
+		SendOn    string
+	}{}
+
+	err := r.ParseForm()
+	if err == nil && r.FormValue("toUsers") != "" {
+		sendOn := ""
+		if r.FormValue("sendOn") != "" {
+			loc, _ := time.LoadLocation("Local")
+			sendOnTime, err := time.ParseInLocation("2006/01/02 15:04:05", r.FormValue("sendOn"), loc)
+
+			if err != nil {
+				log.Println(err.Error())
+				errorMsg = "Invalid send on date."
+			} else {
+				sendOn = sendOnTime.Format("2006-01-02 15:04:05")
+			}
+		}
+
+		if errorMsg == "" {
+			messageID, _ := strconv.ParseInt(r.FormValue("messageID"), 10, 64)
+
+			msg := &Message{
+				ID:     messageID,
+				SendOn: sendOn,
+			}
+
+			if err := msg.Load(); err != nil {
+				errorMsg = "Invalid message."
+			} else {
+				for _, username := range strings.Split(r.FormValue("toUsers"), ";") {
+					if username != "" {
+						parts := strings.Split(username, "@")
+						msg.AddTo(parts[0], parts[1], nil)
+					}
+				}
+
+				if err := msg.Send(); err != nil {
+					log.Println(err.Error())
+					errorMsg = "Unable to send message."
+				} else {
+					successMsg = "Message sent!"
+				}
+			}
+		}
+
+		if errorMsg != "" {
+			messageID, _ := strconv.ParseInt(r.FormValue("messageID"), 10, 64)
+
+			formData = struct {
+				MessageID int64
+				ToUsers   string
+				SendOn    string
+			}{
+				MessageID: messageID,
+				ToUsers:   r.FormValue("toUsers"),
+				SendOn:    r.FormValue("sendOn"),
+			}
+		}
+	}
+
 	var landing, state string
 
 	if v := params.Get("landing"); v != "" {
@@ -204,6 +270,13 @@ func AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 	}
 
+	messageList, err := GetMessageList()
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, "Internal server error.", 500)
+		return
+	}
+
 	data := struct {
 		Active      string
 		MessageList []*Message
@@ -215,6 +288,11 @@ func AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 		Params      struct {
 			State   string
 			Landing string
+		}
+		Form struct {
+			MessageID int64
+			ToUsers   string
+			SendOn    string
 		}
 		LandingPages []string
 	}{
@@ -229,7 +307,11 @@ func AdminUsersHandler(w http.ResponseWriter, r *http.Request) {
 			State:   state,
 			Landing: landing,
 		},
+		Form:         formData,
 		LandingPages: landingPages,
+		MessageList:  messageList,
+		Success:      successMsg,
+		Error:        errorMsg,
 	}
 
 	err = Templates.ExecuteTemplate(w, "admin_users", data)

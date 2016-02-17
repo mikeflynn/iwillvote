@@ -94,7 +94,7 @@ func ProcessS3Emails(bucketName string, limit int64) (int, error) {
 			},
 			Message:  string(body),
 			Outgoing: 0,
-			Slug:     MakeSlug("incoming_" + uuid + "@" + DomainToNetwork(from[1])),
+			Slug:     MakeSlug("incoming_" + from[0] + "@" + DomainToNetwork(from[1])),
 		}
 
 		if err := msg.Save(); err != nil {

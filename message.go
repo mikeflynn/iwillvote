@@ -158,6 +158,7 @@ func (this *Message) AddTo(uuid string, network string, params map[string]string
 		Network:   network,
 		MessageID: this.ID,
 		Params:    params,
+		SendOn:    this.SendOn,
 	})
 }
 

@@ -89,7 +89,7 @@
         </tr>
         {{range $key, $row := .UserList}}
         <tr>
-          <td><input type="checkbox" value="{{$row.UUID}}@{{$row.Network}}" name="user_{{$key}}"></td>
+          <td><input type="checkbox" value="{{$row.UUID}}@{{$row.Network}}" name="user_{{$row.UUID}}@{{$row.Network}}"></td>
           <td><a href="/admin/users/{{$row.UUID}}@{{$row.Network}}">{{$row.UUID}}@{{$row.Network}}</a></td>
           <td>{{$row.Name}}</td>
           <td>{{$row.State}}</td>
@@ -111,25 +111,86 @@
 
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-      <form action="" method="post">
+      <form id="blastForm" action="" method="post">
         <h2>Send Message Blast</h2>
         <div class="form-group">
           <label for="messageSlugInput">Message</label>
-          <select class="form-control" id="messageInput">
-            <options value="">Select a Message</options>
+          <select name="messageID" class="form-control" id="messageInput">
+            <option value="">Select a Message</option>
+            {{range $key, $row := .MessageList}}
+            <option value="{{$row.ID}}" {{if eq $row.ID $.Form.MessageID}}selected{{end}}>{{$row.Slug}}</option>
+            {{end}}
           </select>
         </div>
         <div class="form-group">
-          <label for="toInput">Users</label>
-          <input type="text" id="toInput" class="form-control" placeholder="UUID@network">
+          <label for="toDisplay">To</label>
+          <input type="text" id="toDisplay" class="form-control" placeholder="..." disabled="disabled" value="">
+          <input type="hidden" name="toUsers" id="toUsers" class="form-control" value="{{.Form.ToUsers}}">
         </div>
         <div class="form-group">
           <label for="sendOnInput">Send On</label>
-          <input type="text" id="sendOnInput" class="form-control" placeholder="2016/06/22 or leave this blank to send now">
+          <input name="sendOn" type="text" id="sendOnInput" class="form-control" value="{{.Form.SendOn}}" placeholder="2016/06/22 05:45:00 or leave this blank to send now">
         </div>
         <button type="submit" class="btn btn-default">Submit</button>
       </form>
+      <br />
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+var checkedUsers = [];
+jQuery(document).ready(function() {
+  checkedUsers = jQuery('input#toUsers').val().split(';');
+
+  checkedUsers = checkedUsers.filter(function(n){
+    return (n != "");
+  });
+
+  for (x in checkedUsers) {
+    jQuery('input[name="user_'+checkedUsers[x]+'"]').prop('checked', true);
+  }
+
+  setDisplay();
+});
+
+function setDisplay() {
+  var userDisplay = "...";
+
+  if (checkedUsers.length == 1) {
+    userDisplay = checkedUsers.length + " user.";
+  } else if (checkedUsers.length > 1) {
+    userDisplay = checkedUsers.length + " users.";
+  }
+
+  jQuery('input#toDisplay').val(userDisplay);
+}
+
+jQuery('td input[type="checkbox"]').click(function(event) {
+  if(jQuery(this).prop('checked')) {
+    checkedUsers.push(jQuery(this).val());
+  } else {
+    idx = checkedUsers.indexOf(jQuery(this).val());
+    if (idx > -1) {
+      checkedUsers.splice(idx, 1);
+    }
+  }
+
+  setDisplay();
+});
+
+jQuery('th input[type="checkbox"]').click(function(event) {
+  if(jQuery(this).prop('checked')) {
+    jQuery('td input[type="checkbox"]').click();
+  } else {
+    jQuery('td input[type="checkbox"]').click();
+  }
+});
+
+jQuery('form#blastForm').submit(function(event) {
+  jQuery('input#toUsers').val(checkedUsers.join(';'));
+  return true;
+});
+</script>
+
 {{end}}
