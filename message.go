@@ -13,7 +13,7 @@ func GetMessageList() ([]*Message, error) {
 
 	result, err := db.Select(`SELECT id, slug, message, m.created_on
 		FROM message AS m
-		WHERE m.outgoing=1
+		WHERE m.outgoing=1 AND slug NOT LIKE 'custom_%'
 		ORDER BY created_on DESC`)
 	if err != nil {
 		return []*Message{}, err
