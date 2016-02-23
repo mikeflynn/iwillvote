@@ -23,10 +23,14 @@ a:hover {
 #header .navbar-brand {
   font-family: 'Palanquin Dark', sans-serif;
   padding: 0px;
-  margin: 10px 0px 0px 0px;
   font-size: 36px;
   color: white;
   text-decoration: none;
+}
+
+#header .navbar-brand img {
+  height: 55px;
+  margin-top: -10px;
 }
 
 #header .buttonbin a {
