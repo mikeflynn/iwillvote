@@ -23,16 +23,16 @@ var Templates *template.Template
 
 // Candidates
 var Candidates map[string]bool = map[string]bool{
-	"clinton":  true,
-	"sanders":  true,
-	"cruz":     true,
-	"carson":   true,
-	"fiorina":  true,
-	"christie": true,
-	"trump":    true,
-	"rubio":    true,
-	"bush":     true,
-	"kodos":    true,
+	"clinton": true,
+	"sanders": true,
+	"cruz":    true,
+	"carson":  true,
+	//"fiorina":  true,
+	//"christie": true,
+	"trump": true,
+	"rubio": true,
+	//"bush":     true,
+	"kodos": true,
 }
 
 func main() {
